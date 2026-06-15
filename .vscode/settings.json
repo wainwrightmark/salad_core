@@ -1,0 +1,18 @@
+{
+  "rust-analyzer.showUnlinkedFileNotification": false,
+  "rust-analyzer.cargo.target": "wasm32-unknown-unknown",
+  "rust-analyzer.cargo.features": [],
+  "deno.enable": true,
+  "deno.enablePaths": [
+    "netlify/edge-functions"
+  ],
+  "deno.unstable": true,
+  "deno.importMap": ".netlify/edge-functions-import-map.json",
+  "deno.path": "C:\\Users\\wainw\\AppData\\Roaming\\netlify\\Config\\deno-cli\\deno.exe",
+  "rust-analyzer.runnables.extraEnv": null,
+  "rust-analyzer.check.features": "all",
+  "rust-analyzer.check.targets": "wasm32-unknown-unknown",
+  // "rust-analyzer.numThreads": null,
+
+
+}

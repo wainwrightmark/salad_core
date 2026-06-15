@@ -1,0 +1,781 @@
+---
+source: src/word_trait.rs
+expression: results
+---
+[
+    SolutionResult {
+        word: "Earth",
+        missing_words: [],
+        solutions: [
+            [
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    15,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Jupiter",
+        missing_words: [
+            "Earth",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    0,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    14,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    7,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Mars",
+        missing_words: [
+            "Earth",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    3,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    11,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Neptune",
+        missing_words: [
+            "Earth",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+            ],
+            [
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Pluto",
+        missing_words: [
+            "Earth",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    4,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    13,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Jupiter",
+        missing_words: [],
+        solutions: [
+            [
+                GridTile(
+                    0,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    14,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    7,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Earth",
+        missing_words: [
+            "Jupiter",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    15,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Mars",
+        missing_words: [
+            "Jupiter",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    3,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    11,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Neptune",
+        missing_words: [
+            "Jupiter",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+            ],
+            [
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Pluto",
+        missing_words: [
+            "Jupiter",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    4,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    13,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Mars",
+        missing_words: [],
+        solutions: [
+            [
+                GridTile(
+                    3,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    11,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Earth",
+        missing_words: [
+            "Mars",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    15,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Jupiter",
+        missing_words: [
+            "Mars",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    0,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    14,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    7,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Neptune",
+        missing_words: [
+            "Mars",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+            ],
+            [
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Pluto",
+        missing_words: [
+            "Mars",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    4,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    13,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Neptune",
+        missing_words: [],
+        solutions: [
+            [
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+            ],
+            [
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Earth",
+        missing_words: [
+            "Neptune",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    15,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Jupiter",
+        missing_words: [
+            "Neptune",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    0,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    14,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    7,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Mars",
+        missing_words: [
+            "Neptune",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    3,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    11,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Pluto",
+        missing_words: [
+            "Neptune",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    4,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    13,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Pluto",
+        missing_words: [],
+        solutions: [
+            [
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    4,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    13,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Earth",
+        missing_words: [
+            "Pluto",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    15,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Jupiter",
+        missing_words: [
+            "Pluto",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    0,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    14,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    7,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Mars",
+        missing_words: [
+            "Pluto",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    3,
+                ),
+                GridTile(
+                    2,
+                ),
+                GridTile(
+                    7,
+                ),
+                GridTile(
+                    11,
+                ),
+            ],
+        ],
+    },
+    SolutionResult {
+        word: "Neptune",
+        missing_words: [
+            "Pluto",
+        ],
+        solutions: [
+            [
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+            ],
+            [
+                GridTile(
+                    8,
+                ),
+                GridTile(
+                    12,
+                ),
+                GridTile(
+                    9,
+                ),
+                GridTile(
+                    10,
+                ),
+                GridTile(
+                    5,
+                ),
+                GridTile(
+                    1,
+                ),
+                GridTile(
+                    6,
+                ),
+            ],
+        ],
+    },
+]

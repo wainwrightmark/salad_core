@@ -1,0 +1,33 @@
+[package]
+name = "salad_core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ustr = { version = ">=1.1", features = ["serde"] }
+itertools = ">=0.14"
+glam = ">=0.33"
+anyhow = ">=1"
+arrayvec = { version = ">=0.7", features = ["serde"] }
+serde = { version = ">=1", features = ["derive", "rc"] }
+strum = { version = ">=0.28", features = ["derive"] }
+hashbrown =  ">=0.17"
+
+
+num-derive = ">=0.4"
+num-traits = ">=0.2"
+base64 = ">=0.22"
+bevy_color = ">=0.18"
+log = ">=0.4"
+const_sized_bit_set = { version = ">=0.5", features = ["serde"] }
+unicode-normalization = ">=0.1"
+unicode-segmentation = ">=1"
+serde_arrays = ">=0.2"
+bit_bag = { git = 'https://github.com/wainwrightmark/bit_bag', features = [
+    "std",
+] }
+finite_state_transducer = { git = 'https://github.com/wainwrightmark/finite_state_transducer' }
+
+[dev-dependencies]
+insta = ">=1.48"
+test-case = ">=3.2"
