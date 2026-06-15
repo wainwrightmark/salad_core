@@ -910,31 +910,6 @@ const HEXAGON_19_POSITIONS: [U8Vec2; 19] = [
     U8Vec2 { x: 4, y: 8 },
     U8Vec2 { x: 6, y: 8 },
 ];
-// const HEXAGON_19_ROTATED_POSITIONS: [U8Vec2; 19] = [
-//     U8Vec2 { x: 6, y:  0 },   //0
-//     U8Vec2 { x: 9, y: 1 },  //1
-//     U8Vec2 { x: 12, y: 2 },  //2
-
-//     U8Vec2 { x: 3, y: 1 },   //3
-//     U8Vec2 { x: 6, y: 2 },   //4
-//     U8Vec2 { x: 9, y: 3 },  //5
-//     U8Vec2 { x: 12, y: 4 },  //6
-
-//     U8Vec2 { x: 0, y: 2 },   //7
-//     U8Vec2 { x: 3, y: 3 },   //8
-//     U8Vec2 { x: 6, y: 4 },   //9
-//     U8Vec2 { x: 9, y: 5 },   //10
-//     U8Vec2 { x: 12, y: 6 },   //11
-
-//     U8Vec2 { x: 0, y: 4 },   //12
-//     U8Vec2 { x: 3, y: 5 },   //13
-//     U8Vec2 { x: 6, y: 6 },   //14
-//     U8Vec2 { x: 9, y: 7 },   //15
-
-//     U8Vec2 { x: 0, y: 6 },   //16
-//     U8Vec2 { x: 3, y: 7 },   //17
-//     U8Vec2 { x: 6, y: 8 },   //18
-// ];
 
 const HEXAGON_19_ROTATED_POSITIONS: [U8Vec2; 19] = [
     U8Vec2 { x: 7, y: 0 },  //0

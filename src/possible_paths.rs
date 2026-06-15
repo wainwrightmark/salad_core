@@ -47,31 +47,3 @@ fn count_set_possible_paths_inner<const GRID_SIZE: usize, LAYOUT: GridLayout<GRI
 
     total
 }
-
-// const ADJACENT_TILES_3: TileMap<GridSet<3, 3, 9>, 3, 3, 9> = create_adjacent_tiles();
-// const ADJACENT_TILES_4: TileMap<GridSet<4, 4, 16>, 4, 4, 16> = create_adjacent_tiles();
-// const ADJACENT_TILES_5: TileMap<GridSet<5, 5, 25>, 5, 5, 25> = create_adjacent_tiles();
-
-// const fn create_adjacent_tiles<const SIZE: usize>() -> TileMap<GridSet, SIZE> {
-//     let mut inner: [GridSet; SIZE] = [GridSet::EMPTY; SIZE];
-
-//     let mut current_tile = Tile::<SIDE_LENGTH>::NORTH_WEST;
-
-//     'outer: loop {
-//         let mut unit_index = 0usize;
-//         while unit_index < Vector::UNITS.len() {
-//             let unit = Vector::UNITS[unit_index];
-//             if let Some(adj_tile) = current_tile.const_add(&unit) {
-//                 inner[current_tile.inner() as usize].insert(&adj_tile);
-//             }
-//             unit_index += 1;
-//         }
-
-//         match current_tile.try_next() {
-//             Some(next) => current_tile = next,
-//             None => break 'outer,
-//         }
-//     }
-
-//     TileMap::from_inner(inner)
-// }

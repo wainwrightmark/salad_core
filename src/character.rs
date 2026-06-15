@@ -469,15 +469,6 @@ mod tests {
         assert_eq!(actual.len(), expected_len);
     }
 
-    // #[test]
-    // fn test_numbers() {
-    //     let char_arr = normalize_characters_vec("ABC0123", &SpecialCharacters::NONE).unwrap();
-
-    //     let actual = char_arr.iter().map(|x| x.as_char()).join("");
-
-    //     assert_eq!("ABC0123", actual)
-    // }
-
     #[test]
     fn test_special_characters() {
         let mut sc = SpecialCharacters::NONE;
