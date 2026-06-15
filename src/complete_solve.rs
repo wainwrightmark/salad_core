@@ -12,7 +12,6 @@ impl FSTHelper {
         grid: &Grid<GRID_SIZE>,
         wa: &impl FST<Character>,
         push_result: &mut impl FnMut(RawWord<GRID_SIZE>),
-        //results: &mut Vec<RawWord< GRID_SIZE>>,
         current_index: FSTIndex,
         new_tile: GridTile,
         used_tiles: &GridSet,
@@ -274,7 +273,7 @@ impl<const GRID_SIZE: usize> RawWord<GRID_SIZE> {
 
 #[cfg(test)]
 mod tests {
-    
+
     use finite_state_transducer::mutable::MutableFST;
     use itertools::Itertools;
 

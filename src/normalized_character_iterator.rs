@@ -1,5 +1,5 @@
-use strum::EnumIs;
 use crate::prelude::*;
+use strum::EnumIs;
 
 pub struct NormalizedCharacterIterator<'s, 'special> {
     special_characters: &'special SpecialCharacters,

@@ -8,7 +8,7 @@ pub struct LetterCounts(pub LetterBag);
 
 impl Display for LetterCounts {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for char in self.clone().into_iter().map(|x| x.as_char()) {
+        for char in self.clone().iter_characters().map(|x| x.as_char()) {
             f.write_char(char)?;
         }
 
@@ -35,7 +35,7 @@ impl LetterCounts {
         self.0.element_count(character as u8 as u32) as usize
     }
 
-    pub fn into_iter(self) -> impl Iterator<Item = Character> + Clone {
+    pub fn iter_characters(self) -> impl Iterator<Item = Character> + Clone {
         self.0
             .iter_elements()
             .map(|x| Character::from_repr(x as u8).unwrap())

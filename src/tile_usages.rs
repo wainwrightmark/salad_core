@@ -2,7 +2,12 @@ use anyhow::bail;
 use itertools::Itertools;
 use ustr::Ustr;
 
-use crate::{GridSet, grid_layout::GridLayout, level_trait::LevelTrait, word_trait::{BasicWordTrait, WordTrait}};
+use crate::{
+    GridSet,
+    grid_layout::GridLayout,
+    level_trait::LevelTrait,
+    word_trait::{BasicWordTrait, WordTrait},
+};
 
 #[derive(Debug, PartialEq)]
 pub struct TileUsages<const GRID_SIZE: usize>(pub [usize; GRID_SIZE]);

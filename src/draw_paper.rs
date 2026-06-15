@@ -4,7 +4,13 @@ use glam::Vec2;
 use itertools::Itertools;
 
 use crate::{
-    grid_layout::{GridLayout, SQRT_3, TileShape}, level_trait::LevelTrait, prelude::*, special_characters::SpecialCharacters, svg_hexagon::{get_hexagon_points_flat_top, get_hexagon_points_pointy_top}, tile_usages::TileUsages, word_trait::BasicWordTrait
+    grid_layout::{GridLayout, SQRT_3, TileShape},
+    level_trait::LevelTrait,
+    prelude::*,
+    special_characters::SpecialCharacters,
+    svg_hexagon::{get_hexagon_points_flat_top, get_hexagon_points_pointy_top},
+    tile_usages::TileUsages,
+    word_trait::BasicWordTrait,
 };
 
 #[derive(Debug, Default)]

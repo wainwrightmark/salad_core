@@ -183,7 +183,11 @@ impl SpecialCharactersNormalized {
 mod tests {
     use itertools::Itertools;
 
-    use crate::{character::normalize_characters_array, prelude::{NormalizedCharacterIterator, SpecialCharacters}, special_characters::SpecialCharactersNormalized};
+    use crate::{
+        character::normalize_characters_array,
+        prelude::{NormalizedCharacterIterator, SpecialCharacters},
+        special_characters::SpecialCharactersNormalized,
+    };
     use test_case::test_case;
 
     #[test_case("", "abcde", "ABCDE")]

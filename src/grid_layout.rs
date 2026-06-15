@@ -7,12 +7,11 @@ use std::iter::FusedIterator;
 use crate::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum GridLayoutType{
+pub enum GridLayoutType {
     Square16,
     Hexagon19Fat,
-    Hexagon19Thin
+    Hexagon19Thin,
 }
-
 
 pub const SQRT_3: f32 = 1.732050807568877293527446341505872367_f32;
 
@@ -403,7 +402,6 @@ impl GridLayout<19> for Hexagon19Layout {
         s
     }
 
-
     fn possible_next_tiles_in_taboo_word(tile: GridTile) -> GridSet {
         const SETS: [GridSet; 19] = {
             let mut sets = [GridSet::EMPTY; 19];
@@ -653,7 +651,6 @@ impl GridLayout<19> for Hexagon19ThinLayout {
         }
         s
     }
-
 
     fn possible_next_tiles_in_taboo_word(tile: GridTile) -> GridSet {
         const SETS: [GridSet; 19] = {
@@ -1030,8 +1027,8 @@ const HEXAGON_19_ADJACENCIES: [GridSet; 19] = {
 pub struct Symmetry<const GRID_SIZE: usize>([u8; GRID_SIZE]);
 
 impl<const GRID_SIZE: usize> Symmetry<GRID_SIZE> {
-    pub const fn new(_0: [u8; GRID_SIZE]) -> Self {
-        Self(_0)
+    pub const fn new(x: [u8; GRID_SIZE]) -> Self {
+        Self(x)
     }
 
     pub const IDENTITY: Self = {

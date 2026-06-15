@@ -1,4 +1,8 @@
-use crate::{character::normalize_characters_array, prelude::*, word_trait::{BasicWordTrait, WordTrait}};
+use crate::{
+    character::normalize_characters_array,
+    prelude::*,
+    word_trait::{BasicWordTrait, WordTrait},
+};
 use std::{collections::BTreeMap, num::NonZeroUsize, sync::LazyLock};
 use ustr::Ustr;
 
