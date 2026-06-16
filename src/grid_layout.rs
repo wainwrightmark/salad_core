@@ -13,6 +13,15 @@ pub enum GridLayoutType {
     Hexagon19Thin,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum TilePositioning{
+    Corner,
+    Edge,
+    Center
+}
+
+
+
 pub const SQRT_3: f32 = 1.732050807568877293527446341505872367_f32;
 
 pub trait GridLayout<const GRID_SIZE: usize>:
@@ -87,6 +96,10 @@ pub trait GridLayout<const GRID_SIZE: usize>:
 
         av
     };
+
+    fn tile_positioning(t: GridTile)-> TilePositioning;
+
+    fn count_tiles_with_positioning(t: TilePositioning)-> usize;
 
     fn board_dimensions(tile_radius: f32) -> Vec2;
 
@@ -262,6 +275,23 @@ impl GridLayout<19> for Hexagon19Layout {
     const TILE_SHAPE: TileShape = TileShape::HexagonPointyTop;
 
     const GAME_URL: &'static str = "https://hexagon-salad.netlify.app";
+
+    fn count_tiles_with_positioning(t: TilePositioning)-> usize {
+        match  t{
+            TilePositioning::Corner => 6,
+            TilePositioning::Edge => 6,
+            TilePositioning::Center => 7,
+        }
+    }
+
+    fn tile_positioning(t: GridTile)-> TilePositioning {
+        match t.0{
+            0|2|11|18|16|7=> TilePositioning::Corner,
+            1|6|15|17|12|3=> TilePositioning::Edge,
+            4|5|8|9|10|13|14 => TilePositioning::Center,
+            _=> TilePositioning::Center
+        }
+    }
 
     fn tile_position_u8(tile: GridTile) -> U8Vec2 {
         HEXAGON_19_POSITIONS[tile.inner_usize()]
@@ -499,6 +529,23 @@ impl GridLayout<19> for Hexagon19ThinLayout {
     const TILE_SHAPE: TileShape = TileShape::HexagonFlatTop;
 
     const GAME_URL: &'static str = "https://hexagon-salad.netlify.app";
+
+    fn count_tiles_with_positioning(t: TilePositioning)-> usize {
+        match  t{
+            TilePositioning::Corner => 6,
+            TilePositioning::Edge => 6,
+            TilePositioning::Center => 7,
+        }
+    }
+
+    fn tile_positioning(t: GridTile)-> TilePositioning {
+        match t.0{
+            0|2|11|18|16|7=> TilePositioning::Corner,
+            1|6|15|17|12|3=> TilePositioning::Edge,
+            4|5|8|9|10|13|14 => TilePositioning::Center,
+            _=> TilePositioning::Center
+        }
+    }
 
     fn tile_position_u8(tile: GridTile) -> U8Vec2 {
         HEXAGON_19_ROTATED_POSITIONS[tile.inner_usize()]
@@ -747,6 +794,23 @@ impl GridLayout<16> for Square16Layout {
     const TILE_SHAPE: TileShape = TileShape::Square;
 
     const GAME_URL: &'static str = "https://wordsalad.online";
+
+    fn count_tiles_with_positioning(t: TilePositioning)-> usize {
+        match  t{
+            TilePositioning::Corner => 4,
+            TilePositioning::Edge => 8,
+            TilePositioning::Center => 4,
+        }
+    }
+
+    fn tile_positioning(t: GridTile)-> TilePositioning {
+        match t.0{
+            0|3|12|15=> TilePositioning::Corner,
+            1|2|7|11|13|14|4|8=> TilePositioning::Edge,
+            5|6|9|10 => TilePositioning::Center,
+            _=> TilePositioning::Center
+        }
+    }
 
     fn tile_position_u8(tile: GridTile) -> U8Vec2 {
         SQUARE_16_POSITIONS[tile.inner_usize()]

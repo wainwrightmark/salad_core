@@ -265,89 +265,86 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         numerator as f32 / denominator as f32
     }
 
-    // /// Normalized difficulty score based on what proportion of letters use the more connected tiles
-    // fn difficulty_score(&self) -> f32 {
-    //     let mut max_score: f32 = 0.0;
+    /// Normalized difficulty score based on what proportion of letters use the more connected tiles
+    fn difficulty_score(&self) -> f32 {
+        let mut max_score: f32 = 0.0;
 
-    //     const CENTRAL_TILE_SCORE: f32 = 8.0;
-    //     const EDGE_TILE_SCORE: f32 = 5.0;
-    //     const CORNER_TILE_SCORE: f32 = 3.0;
+        const CENTRAL_TILE_SCORE: f32 = 8.0;
+        const EDGE_TILE_SCORE: f32 = 5.0;
+        const CORNER_TILE_SCORE: f32 = 3.0;
 
-    //     for word in self.words() {
-    //         let chars = word.characters().len();
+        for word in self.words() {
+            let chars = word.characters().len();
 
-    //         let central_tiles: usize;
-    //         let edge_tiles: usize;
-    //         let corner_tiles: usize;
-    //         match chars {
-    //             0..=4 => {
-    //                 central_tiles = chars;
-    //                 edge_tiles = 0;
-    //                 corner_tiles = 0
-    //             }
-    //             5..=12 => {
-    //                 central_tiles = 4;
-    //                 edge_tiles = chars - 4;
-    //                 corner_tiles = 0;
-    //             }
-    //             13.. => {
-    //                 central_tiles = 4;
-    //                 edge_tiles = 8;
-    //                 corner_tiles = chars - 12;
-    //             }
-    //         }
+            let layout_central_tiles =
+                Self::Layout::count_tiles_with_positioning(TilePositioning::Center);
+            let layout_edge_tiles =
+                Self::Layout::count_tiles_with_positioning(TilePositioning::Edge);
 
-    //         let word_score = ((central_tiles as f32) * CENTRAL_TILE_SCORE)
-    //             + ((edge_tiles as f32) * EDGE_TILE_SCORE)
-    //             + ((corner_tiles as f32) * CORNER_TILE_SCORE);
+            let central_tiles: usize;
+            let edge_tiles: usize;
+            let corner_tiles: usize;
 
-    //         max_score += word_score;
-    //     }
+            if chars <= layout_central_tiles {
+                central_tiles = chars;
+                edge_tiles = 0;
+                corner_tiles = 0
+            } else if chars <= (layout_central_tiles + layout_edge_tiles) {
+                central_tiles = layout_central_tiles;
+                edge_tiles = chars - layout_central_tiles;
+                corner_tiles = 0;
+            } else {
+                central_tiles = layout_central_tiles;
+                edge_tiles = layout_edge_tiles;
+                corner_tiles = chars - (layout_central_tiles + layout_edge_tiles);
+            }
 
-    //     let max_score = max_score;
-    //     let grid_prime_bag = PrimeBag128::try_from_iter(self.grid().iter())
-    //         .expect("Should be able to make prime bag for grid");
+            let word_score = ((central_tiles as f32) * CENTRAL_TILE_SCORE)
+                + ((edge_tiles as f32) * EDGE_TILE_SCORE)
+                + ((corner_tiles as f32) * CORNER_TILE_SCORE);
 
-    //     let mut score: f32 = 0.0;
+            max_score += word_score;
+        }
 
-    //     for (tile, character) in self.grid().enumerate() {
-    //         let mut words_using = 0usize;
-    //         let mut words_maybe_using = 0usize;
+        let max_score = max_score;
+        let grid_prime_bag = LetterCounts::try_from_iter(self.grid().iter())
+            .expect("Should be able to make prime bag for grid");
 
-    //         let char_instances = grid_prime_bag.count_instances(character);
+        let mut score: f32 = 0.0;
 
-    //         for word in self.words() {
-    //             let word_char_instances = word
-    //                 .characters()
-    //                 .iter()
-    //                 .filter(|c| character.eq(c))
-    //                 .count();
+        for (tile, character) in self.grid().enumerate() {
+            let mut words_using = 0usize;
+            let mut words_maybe_using = 0usize;
 
-    //             if word_char_instances == 0 {
-    //             } else if word_char_instances == char_instances
-    //                 || word
-    //                     .find_solutions(self.grid())
-    //                     .all(|arr| arr.contains(&tile))
-    //             {
-    //                 words_using += 1;
-    //             } else {
-    //                 words_maybe_using += 1;
-    //             }
-    //         }
+            let char_instances = grid_prime_bag.count_instances(character);
 
-    //         let tile_score = if tile.is_corner() {
-    //             CORNER_TILE_SCORE
-    //         } else if tile.is_edge() {
-    //             EDGE_TILE_SCORE
-    //         } else {
-    //             CENTRAL_TILE_SCORE
-    //         };
+            for word in self.words() {
+                let word_char_instances =
+                    word.characters().iter().filter(|c| character.eq(c)).count();
 
-    //         score += (tile_score) * ((words_using as f32) + ((words_maybe_using as f32) * 0.5));
-    //     }
+                if word_char_instances == 0 {
+                } else if word_char_instances == char_instances
+                    || word
+                        .find_solutions::<Self::Layout>(self.grid())
+                        .all(|arr| arr.contains(&tile))
+                {
+                    words_using += 1;
+                } else {
+                    words_maybe_using += 1;
+                }
+            }
 
-    //     score / max_score
-    // }
+            let tile_score = match Self::Layout::tile_positioning(tile) {
+                TilePositioning::Corner => CORNER_TILE_SCORE,
+                TilePositioning::Edge => EDGE_TILE_SCORE,
+                TilePositioning::Center => CENTRAL_TILE_SCORE,
+            };
+
+            score += (tile_score) * ((words_using as f32) + ((words_maybe_using as f32) * 0.5));
+        }
+
+        score / max_score
+    }
 
     /// Returns whether the every non-blank tile in the grid is needed
     fn are_all_tiles_needed(&self) -> bool {
@@ -668,5 +665,20 @@ mod tests {
                 insta::assert_snapshot!(svg);
             }
         }
+    }
+
+    #[test]
+    pub fn test_level_difficulty_store() {
+        let level1 = crate::designed_level::DesignedLevel::<19, Hexagon19Layout>::from_tsv_line(
+            // spellchecker:disable-next-line
+            r#"CREHAUSORLADIOMESTR		aroma[You might pick it up at a coffee shop]	choir[Ones who agree with you metaphorically]	Christmas[A famous father]	Carol[Number by a door]	crusade[Campaign religiously]	Treasure[Something found at "X"]	measure[Piano Bar]	medal[Come third or better]	salome[Dancer Of The Seven Veils]	tremor[It's a fault's fault]"#,
+            true
+        )
+        .unwrap();
+
+        let score = level1.difficulty_score();
+
+
+        assert_eq!(score, 0.9383838)
     }
 }
