@@ -265,9 +265,9 @@ impl SymmetryRestriction {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Hexagon19Layout;
+pub struct Hexagon19FatLayout;
 
-impl GridLayout<19> for Hexagon19Layout {
+impl GridLayout<19> for Hexagon19FatLayout {
     // const TILES_WIDE: usize = 5;
     // const TILES_HIGH: usize = 5;
 
@@ -1269,7 +1269,7 @@ mod tests {
     use const_sized_bit_set::prelude::BitSet;
 
     use crate::{
-        grid_layout::{GridLayout, Hexagon19Layout, Square16Layout},
+        grid_layout::{GridLayout, Hexagon19FatLayout, Square16Layout},
         prelude::GridTile,
     };
 
@@ -1292,13 +1292,13 @@ mod tests {
     pub fn test_hexagon_layout_tile_positions() {
         const TILE_SIZE: f32 = 100.0;
 
-        for tile in Hexagon19Layout::ALL_NODES.iter() {
+        for tile in Hexagon19FatLayout::ALL_NODES.iter() {
             let tile = GridTile(tile as u8);
 
-            let position = Hexagon19Layout::tile_position(tile, TILE_SIZE, true);
+            let position = Hexagon19FatLayout::tile_position(tile, TILE_SIZE, true);
 
             let tile_at_position =
-                Hexagon19Layout::get_tile_from_position(position, TILE_SIZE, 0.0);
+                Hexagon19FatLayout::get_tile_from_position(position, TILE_SIZE, 0.0);
 
             assert_eq!(Some(tile), tile_at_position)
         }

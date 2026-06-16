@@ -496,7 +496,7 @@ mod tests {
 
     use crate::{
         draw_paper::AllDrawPaperModifiers,
-        grid_layout::{Hexagon19Layout, Square16Layout},
+        grid_layout::{Hexagon19FatLayout, Square16Layout},
         prelude::*,
     };
 
@@ -631,7 +631,7 @@ mod tests {
 
     #[test]
     pub fn test_paper_svg_hexagon() {
-        let level1 = crate::designed_level::DesignedLevel::<19, Hexagon19Layout>::from_tsv_line(
+        let level1 = crate::designed_level::DesignedLevel::<19, Hexagon19FatLayout>::from_tsv_line(
             // spellchecker:disable-next-line
             r#"CREHAUSORLADIOMESTR		aroma[You might pick it up at a coffee shop]	choir[Ones who agree with you metaphorically]	Christmas[A famous father]	Carol[Number by a door]	crusade[Campaign religiously]	Treasure[Something found at "X"]	measure[Piano Bar]	medal[Come third or better]	salome[Dancer Of The Seven Veils]	tremor[It's a fault's fault]"#,
             true
@@ -669,7 +669,7 @@ mod tests {
 
     #[test]
     pub fn test_level_difficulty_store() {
-        let level1 = crate::designed_level::DesignedLevel::<19, Hexagon19Layout>::from_tsv_line(
+        let level1 = crate::designed_level::DesignedLevel::<19, Hexagon19FatLayout>::from_tsv_line(
             // spellchecker:disable-next-line
             r#"CREHAUSORLADIOMESTR		aroma[You might pick it up at a coffee shop]	choir[Ones who agree with you metaphorically]	Christmas[A famous father]	Carol[Number by a door]	crusade[Campaign religiously]	Treasure[Something found at "X"]	measure[Piano Bar]	medal[Come third or better]	salome[Dancer Of The Seven Veils]	tremor[It's a fault's fault]"#,
             true
