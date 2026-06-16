@@ -20,7 +20,10 @@ pub enum TilePositioning{
     Center
 }
 
-
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum ArrowDirection{
+    Up, Down, Left, Right
+}
 
 pub const SQRT_3: f32 = 1.732050807568877293527446341505872367_f32;
 
@@ -96,6 +99,8 @@ pub trait GridLayout<const GRID_SIZE: usize>:
 
         av
     };
+
+    fn move_tile_direction(tile: GridTile, direction: ArrowDirection)-> Option<GridTile>;
 
     fn tile_positioning(t: GridTile)-> TilePositioning;
 
@@ -275,6 +280,50 @@ impl GridLayout<19> for Hexagon19Layout {
     const TILE_SHAPE: TileShape = TileShape::HexagonPointyTop;
 
     const GAME_URL: &'static str = "https://hexagon-salad.netlify.app";
+
+    fn move_tile_direction(tile: GridTile, direction: ArrowDirection)-> Option<GridTile> {
+        match direction{
+            ArrowDirection::Up => {
+                let amount_to_sub = match tile.0 {
+                    0|1|2=> return None,
+                    3|4|5 => 3,
+                    6|7|8|9|10  |16|17|18 => 4,
+                    11|12|13|14|15 => 5,
+                    _=> return None,
+                };
+
+
+                let new_inner  = tile.0.checked_sub(amount_to_sub)?;
+                Some(GridTile(new_inner))
+            },
+            ArrowDirection::Down => {
+                let amount_to_add = match tile.0 {
+                    0|1|2|11|12|13|14|15 => 4,
+                    16|17|18=> {return None;}
+                    3|4|5|6|7|8|9|10=> 5,
+                    _=>{return None;}
+                };
+
+                let new_inner  = tile.0.checked_add(amount_to_add)?;
+                
+                Some(GridTile(new_inner))
+            },
+            ArrowDirection::Left => {
+                if matches!(tile.0, 0|3|7|12|16){
+                    return None;
+                }
+                let new_inner  = tile.0.checked_sub(1)?;                
+                Some(GridTile(new_inner))
+            },
+            ArrowDirection::Right => {                
+                if matches!(tile.0, 2|6|11|15|18){
+                    return None;
+                }
+                let new_inner  = tile.0.checked_add(1)?;                                
+                Some(GridTile(new_inner))
+            },
+        }
+    }
 
     fn count_tiles_with_positioning(t: TilePositioning)-> usize {
         match  t{
@@ -529,6 +578,72 @@ impl GridLayout<19> for Hexagon19ThinLayout {
     const TILE_SHAPE: TileShape = TileShape::HexagonFlatTop;
 
     const GAME_URL: &'static str = "https://hexagon-salad.netlify.app";
+
+
+    fn move_tile_direction(tile: GridTile, direction: ArrowDirection)-> Option<GridTile> {
+        match direction{
+            ArrowDirection::Up => {
+                let amount_to_sub = match tile.0 {
+                    4|5|6|16|17|18 => 4,
+                    8|12|13|9|14|10|11|15=> 5,
+                    0|1|2|3|7 => {return None},
+                    _=> return None,
+                };
+
+
+                let new_inner  = tile.0.checked_sub(amount_to_sub)?;
+                Some(GridTile(new_inner))
+            },
+            ArrowDirection::Down => {
+                let amount_to_add = match tile.0 {
+                    0|1|2|12|13|14=> 4,
+                    3|7|8|4|9|5|6|10=>5,
+                    16|17|18|15|11=> {return None;}
+                    _=>{return None;}
+                };
+
+                let new_inner  = tile.0.checked_add(amount_to_add)?;
+                
+                Some(GridTile(new_inner))
+            },
+            ArrowDirection::Left => {
+                let new_inner = match tile.0{
+                    0=>3,
+                    1=>0,
+                    2=>1,
+                    3=>7,
+                    4=>3,
+                    5=>4,
+                    6=>5,
+                    7=>return None,
+                    8=>7,
+                    9=>8,
+                    10=>9,
+                    11=>10,
+                    12=>return None,
+                    13=>12,
+                    14=>13,
+                    15=>14,
+                    16=>return None,
+                    17=>16,
+                    18=>17,
+                    _=> return None,
+                };            
+                Some(GridTile(new_inner))
+            },
+            ArrowDirection::Right => {                              
+                let amount_to_add = match tile.0 {
+                    0|1|3|4|5|7|8|9|10|12|13|14|16|17=> 1,                    
+                    2|6|11|15|18=> {return None;}
+                    _=>{return None;}
+                };
+
+                let new_inner  = tile.0.checked_add(amount_to_add)?;
+                
+                Some(GridTile(new_inner))
+            },
+        }
+    }
 
     fn count_tiles_with_positioning(t: TilePositioning)-> usize {
         match  t{
@@ -794,6 +909,34 @@ impl GridLayout<16> for Square16Layout {
     const TILE_SHAPE: TileShape = TileShape::Square;
 
     const GAME_URL: &'static str = "https://wordsalad.online";
+
+    fn move_tile_direction(tile: GridTile, direction: ArrowDirection)-> Option<GridTile> {
+        match direction{
+            ArrowDirection::Up => {
+                let new_inner  = tile.0.checked_sub(4)?;
+                Some(GridTile(new_inner))
+            },
+            ArrowDirection::Down => {
+                let new_inner  = tile.0.checked_add(4)?;
+                if new_inner > 15{return None;}
+                Some(GridTile(new_inner))
+            },
+            ArrowDirection::Left => {
+                if tile.0 % 4 == 0{
+                    return None;
+                }
+                let new_inner  = tile.0.checked_sub(1)?;                
+                Some(GridTile(new_inner))
+            },
+            ArrowDirection::Right => {                
+                let new_inner  = tile.0.checked_add(1)?;                
+                if new_inner % 4 == 0{
+                    return None;
+                }
+                Some(GridTile(new_inner))
+            },
+        }
+    }
 
     fn count_tiles_with_positioning(t: TilePositioning)-> usize {
         match  t{
