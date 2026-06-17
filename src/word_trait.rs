@@ -148,8 +148,76 @@ impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>> Iterator
 }
 
 pub trait BasicWordTrait: Clone + Ord + PartialEq + PartialEq {
+    //todo move some default methods from WordTrait here
     fn text(&self) -> Ustr;
     fn characters_slice(&self) -> &[Character];
+
+    fn hinted_text(&self, hints: NonZeroUsize) -> String {
+        //todo test and check special characters
+        let mut result: String = Default::default();
+        let mut hints_left = hints.get();
+
+        let unicode_graphemes =
+            unicode_segmentation::UnicodeSegmentation::graphemes(self.text().as_str(), true);
+
+        for grapheme in unicode_graphemes {
+            let mut normalized = unicode_normalization::UnicodeNormalization::nfd(grapheme);
+
+            let Some(c) = normalized.next() else {
+                continue;
+            };
+
+            let Ok(character) = Character::try_from(c) else {
+                result.push_str(grapheme);
+                continue;
+            };
+
+            if character.is_blank() || hints_left > 0 {
+                result.push_str(grapheme);
+                if !character.is_blank() {
+                    hints_left = hints_left.saturating_sub(1);
+                }
+            } else {
+                result.push_str(" _");
+            }
+        }
+
+        result
+    }
+
+    /// Same as hinted text but without spaces between underscores
+    fn hinted_text_compact(&self, hints: NonZeroUsize) -> String {
+        //todo test and check special characters
+        let mut result: String = Default::default();
+        let mut hints_left = hints.get();
+
+        let unicode_graphemes =
+            unicode_segmentation::UnicodeSegmentation::graphemes(self.text().as_str(), true);
+
+        for grapheme in unicode_graphemes {
+            let mut normalized = unicode_normalization::UnicodeNormalization::nfd(grapheme);
+
+            let Some(c) = normalized.next() else {
+                continue;
+            };
+
+            let Ok(character) = Character::try_from(c) else {
+                result.push_str(grapheme);
+                continue;
+            };
+
+            if character.is_blank() || hints_left > 0 {
+                result.push_str(grapheme);
+                if !character.is_blank() {
+                    hints_left = hints_left.saturating_sub(1);
+                }
+            } else {
+                result.push_str("_");
+            }
+        }
+
+        result
+    }
 }
 
 pub trait WordWithCounts: BasicWordTrait {
@@ -220,111 +288,14 @@ pub trait WordTrait<const GRID_SIZE: usize>: BasicWordTrait {
         }
         true
     }
-
-    /// The word lengths of the answer. No brackets
-    fn hidden_text(&self) -> String {
-        let mut hidden_text: String = Default::default();
-        let mut stack: usize = 0;
-
-        let unicode_graphemes =
-            unicode_segmentation::UnicodeSegmentation::graphemes(self.text().as_str(), true);
-
-        for grapheme in unicode_graphemes {
-            let mut normalized = unicode_normalization::UnicodeNormalization::nfd(grapheme);
-
-            let Some(c) = normalized.next() else {
-                continue;
-            };
-
-            let Ok(character) = Character::try_from(c) else {
-                continue;
-            };
-
-            if character.is_blank() {
-                if let Some(char_to_push) = {
-                    if ['-', '‐', '–', '—'].contains(&c) {
-                        Some('-')
-                    } else if c.is_ascii_whitespace() {
-                        Some(',') //use a comma instead of a space, like a crossword clue
-                    } else {
-                        None
-                    }
-                } {
-                    if stack > 0 {
-                        hidden_text += stack.to_string().as_str();
-                        stack = 0;
-                    }
-                    hidden_text.push(char_to_push);
-                }
-
-                // otherwise ignore the character in the hidden text
-            } else {
-                stack += 1;
-            }
-        }
-        if stack > 0 {
-            hidden_text += stack.to_string().as_str();
-        }
-
-        hidden_text
-    }
-
-    fn hinted_text(&self, hints: NonZeroUsize) -> String {
-        //todo test and check special characters
-        let mut result: String = Default::default();
-        let mut hints_left = hints.get();
-
-        let unicode_graphemes =
-            unicode_segmentation::UnicodeSegmentation::graphemes(self.text().as_str(), true);
-
-        for grapheme in unicode_graphemes {
-            let mut normalized = unicode_normalization::UnicodeNormalization::nfd(grapheme);
-
-            let Some(c) = normalized.next() else {
-                continue;
-            };
-
-            let Ok(character) = Character::try_from(c) else {
-                result.push_str(grapheme);
-                continue;
-            };
-
-            if character.is_blank() || hints_left > 0 {
-                result.push_str(grapheme);
-                if !character.is_blank(){
-                    hints_left = hints_left.saturating_sub(1);
-                }
-            } else {
-                result.push_str(" _");
-            }
-        }
-
-        result
-    }
-
-    // /// Same as hinted text but without spaces between underscores
-    // fn hinted_text_compact(&self, hints: NonZeroUsize) -> String {
-    //     let mut result: String = Default::default();
-    //     let mut hints_left = hints.get();
-
-    //     for grapheme in self.graphemes.iter() {
-    //         if !grapheme.is_game_char || hints_left > 0 {
-    //             result.push_str(grapheme.grapheme.as_str());
-    //             if grapheme.is_game_char {
-    //                 hints_left = hints_left.saturating_sub(1);
-    //             }
-    //         } else {
-    //             result.push_str("ˍ");
-    //         }
-    //     }
-
-    //     result
-    // }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::{fmt::Write as _, num::NonZeroUsize};
+
     use const_sized_bit_set::prelude::BitSet;
+    use insta::assert_snapshot;
     use itertools::Itertools;
 
     use crate::{
@@ -332,6 +303,22 @@ mod tests {
         word_trait::WordTrait,
     };
     pub type Solution4x4 = Solution<16>;
+
+    #[test]
+    pub fn test_hinted_text() {
+        let special_characters = SpecialCharacters::from_iter(["test"]);
+
+        let mut output = String::new();
+        for word in ["Singleton", "Two Word", "Three-Word", "Attestation"] {
+            let raw_word: DisplayWord<_> =
+                DisplayWord::<16>::from_string(word, &special_characters).unwrap();
+            let hinted = raw_word.hinted_text(NonZeroUsize::try_from(6).unwrap());
+            let hinted_compact = raw_word.hinted_text_compact(NonZeroUsize::try_from(6).unwrap());
+            writeln!(&mut output, "{word}: '{hinted}' / '{hinted_compact}'").unwrap();
+        }
+
+        assert_snapshot!(output)
+    }
 
     #[test]
     pub fn test_find_solutions() {

@@ -3,7 +3,7 @@ use crate::{
     prelude::*,
     word_trait::{BasicWordTrait, WordTrait},
 };
-use std::{collections::BTreeMap, num::NonZeroUsize, sync::LazyLock};
+use std::{collections::BTreeMap, sync::LazyLock};
 use ustr::Ustr;
 
 // pub type DisplayWord4x4 = DisplayWord<4, 16>;
@@ -149,42 +149,42 @@ static COLORS_MAP: LazyLock<BTreeMap<&[Character], bevy_color::Srgba>> = LazyLoc
 });
 
 impl<const GRID_SIZE: usize> DisplayWord<GRID_SIZE> {
-    pub fn hinted_text(&self, hints: NonZeroUsize) -> String {
-        let mut result: String = Default::default();
-        let mut hints_left = hints.get();
+    // pub fn hinted_text(&self, hints: NonZeroUsize) -> String {
+    //     let mut result: String = Default::default();
+    //     let mut hints_left = hints.get();
 
-        for grapheme in self.graphemes.iter() {
-            if !grapheme.is_game_char || hints_left > 0 {
-                result.push_str(grapheme.grapheme.as_str());
-                if grapheme.is_game_char {
-                    hints_left = hints_left.saturating_sub(1);
-                }
-            } else {
-                result.push_str(" _");
-            }
-        }
+    //     for grapheme in self.graphemes.iter() {
+    //         if !grapheme.is_game_char || hints_left > 0 {
+    //             result.push_str(grapheme.grapheme.as_str());
+    //             if grapheme.is_game_char {
+    //                 hints_left = hints_left.saturating_sub(1);
+    //             }
+    //         } else {
+    //             result.push_str(" _");
+    //         }
+    //     }
 
-        result
-    }
+    //     result
+    // }
 
-    /// Same as hinted text but without spaces between underscores
-    pub fn hinted_text_compact(&self, hints: NonZeroUsize) -> String {
-        let mut result: String = Default::default();
-        let mut hints_left = hints.get();
+    // /// Same as hinted text but without spaces between underscores
+    // pub fn hinted_text_compact(&self, hints: NonZeroUsize) -> String {
+    //     let mut result: String = Default::default();
+    //     let mut hints_left = hints.get();
 
-        for grapheme in self.graphemes.iter() {
-            if !grapheme.is_game_char || hints_left > 0 {
-                result.push_str(grapheme.grapheme.as_str());
-                if grapheme.is_game_char {
-                    hints_left = hints_left.saturating_sub(1);
-                }
-            } else {
-                result.push('ˍ');
-            }
-        }
+    //     for grapheme in self.graphemes.iter() {
+    //         if !grapheme.is_game_char || hints_left > 0 {
+    //             result.push_str(grapheme.grapheme.as_str());
+    //             if grapheme.is_game_char {
+    //                 hints_left = hints_left.saturating_sub(1);
+    //             }
+    //         } else {
+    //             result.push('ˍ');
+    //         }
+    //     }
 
-        result
-    }
+    //     result
+    // }
 
     pub fn custom_color(&self) -> Option<bevy_color::Srgba> {
         COLORS_MAP.get(&self.characters.as_slice()).cloned()
