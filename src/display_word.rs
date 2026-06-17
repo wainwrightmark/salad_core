@@ -3,6 +3,7 @@ use crate::{
     prelude::*,
     word_trait::{BasicWordTrait, WordTrait},
 };
+use itertools::Itertools;
 use std::{collections::BTreeMap, sync::LazyLock};
 use ustr::Ustr;
 
@@ -246,20 +247,40 @@ impl<const GRID_SIZE: usize> DisplayWord<GRID_SIZE> {
 
         for r in iter {
             match r {
-                NormalizedCharacterResult::Error(err) => {
-                    return Err(err);
+                NormalizedCharacterResult::Error { message, .. } => {
+                    return Err(message);
                 }
                 NormalizedCharacterResult::RegularCharacter {
-                    character: inner,
-                    grapheme_count,
+                    character,
                     grapheme,
                 } => {
-                    characters.try_push(inner).map_err(|_| "Word is too long")?;
-                    stack += grapheme_count;
+                    characters
+                        .try_push(character)
+                        .map_err(|_| "Word is too long")?;
+                    stack += 1;
 
                     graphemes.push(CharGrapheme {
                         is_game_char: true,
                         grapheme: Ustr::from(grapheme),
+                    });
+                }
+                NormalizedCharacterResult::SpecialCharacter {
+                    character,
+                    first_grapheme,
+                    additional_graphemes,
+                } => {
+                    characters
+                        .try_push(character)
+                        .map_err(|_| "Word is too long")?;
+                    stack += 1;
+
+                    graphemes.push(CharGrapheme {
+                        is_game_char: true,
+                        grapheme: Ustr::from(
+                            (std::iter::once(first_grapheme).chain(additional_graphemes))
+                                .join("")
+                                .as_str(),
+                        ),
                     });
                 }
                 NormalizedCharacterResult::Blank { grapheme } => {

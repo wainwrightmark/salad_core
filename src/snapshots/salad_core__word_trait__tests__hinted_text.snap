@@ -5,4 +5,4 @@ expression: output
 Singleton: 'Single _ _ _' / 'Single___'
 Two Word: 'Two Wor _' / 'Two Wor_'
 Three-Word: 'Three-W _ _ _' / 'Three-W___'
-Attestation: 'Attest _ _ _ _ _' / 'Attest_____'
+Attestation: 'Attestati _ _' / 'Attestati__'

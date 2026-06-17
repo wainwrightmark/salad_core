@@ -6,14 +6,24 @@ pub struct NormalizedCharacterIterator<'s, 'special> {
     graphemes: unicode_segmentation::Graphemes<'s>,
 }
 
-#[derive(Debug, Clone, PartialEq, EnumIs)]
+#[derive(Debug, Clone, EnumIs)]
 pub enum NormalizedCharacterResult<'s> {
-    Error(&'static str),
-    RegularCharacter {
-        character: Character,
-        grapheme_count: usize,
+    Error {
+        message: &'static str,
         grapheme: &'s str,
     },
+    RegularCharacter {
+        character: Character,
+
+        grapheme: &'s str,
+    },
+
+    SpecialCharacter {
+        character: Character,
+        first_grapheme: &'s str,
+        additional_graphemes: std::iter::Take<unicode_segmentation::Graphemes<'s>>,
+    },
+
     Blank {
         grapheme: &'s str,
     },
@@ -22,10 +32,9 @@ pub enum NormalizedCharacterResult<'s> {
 impl<'s> NormalizedCharacterResult<'s> {
     pub const fn inner_char(&self) -> Result<Character, &'static str> {
         match self {
-            NormalizedCharacterResult::Error(err) => Err(err),
-            NormalizedCharacterResult::RegularCharacter {
-                character: inner, ..
-            } => Ok(*inner),
+            NormalizedCharacterResult::Error { message, .. } => Err(message),
+            NormalizedCharacterResult::RegularCharacter { character, .. } => Ok(*character),
+            NormalizedCharacterResult::SpecialCharacter { character, .. } => Ok(*character),
             NormalizedCharacterResult::Blank { .. } => Ok(Character::Blank),
         }
     }
@@ -57,10 +66,10 @@ impl<'s, 'special> Iterator for NormalizedCharacterIterator<'s, 'special> {
                 if grapheme.len() < sc_str.len()
                     && sc_str[..grapheme.len()].eq_ignore_ascii_case(grapheme)
                 {
-                    let mut grapheme_count = 1;
+                    let mut grapheme_count = 1usize;
                     sc_str = &sc_str[grapheme.len()..];
+                    let mut graphemes2 = self.graphemes.clone();
                     if !sc_str.is_empty() {
-                        let mut graphemes2 = self.graphemes.clone();
                         'extra_graphemes: loop {
                             let Some(next_grapheme) = graphemes2.next() else {
                                 continue 'special;
@@ -74,15 +83,16 @@ impl<'s, 'special> Iterator for NormalizedCharacterIterator<'s, 'special> {
                                 break 'extra_graphemes;
                             }
                         }
-                        self.graphemes = graphemes2;
+                        std::mem::swap(&mut self.graphemes, &mut graphemes2);
                     }
 
-                    let inner = Character::try_from_special_index(special_character_index).unwrap();
+                    let character =
+                        Character::try_from_special_index(special_character_index).unwrap();
 
-                    return Some(NormalizedCharacterResult::RegularCharacter {
-                        character: inner,
-                        grapheme_count,
-                        grapheme,
+                    return Some(NormalizedCharacterResult::SpecialCharacter {
+                        character,
+                        first_grapheme: grapheme,
+                        additional_graphemes: graphemes2.take(grapheme_count.saturating_sub(1)),
                     });
                 }
             }
@@ -98,12 +108,12 @@ impl<'s, 'special> Iterator for NormalizedCharacterIterator<'s, 'special> {
                 } else {
                     Some(NormalizedCharacterResult::RegularCharacter {
                         character,
-                        grapheme_count: 1,
+
                         grapheme,
                     })
                 }
             }
-            Err(err) => Some(NormalizedCharacterResult::Error(err)),
+            Err(message) => Some(NormalizedCharacterResult::Error { message, grapheme }),
         }
     }
 }

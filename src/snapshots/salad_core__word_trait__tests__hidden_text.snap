@@ -1,6 +1,5 @@
 ---
 source: src/word_trait.rs
-assertion_line: 367
 expression: output
 ---
 Singleton: '9'

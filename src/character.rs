@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use strum::{EnumCount, EnumIs, EnumIter, FromRepr};
 
 use crate::{
-    prelude::{Character::Special0, NormalizedCharacterIterator},
+    prelude::{Character::Special0, NormalizedCharacterIterator, NormalizedCharacterResult},
     special_characters::SpecialCharacters,
 };
 
@@ -309,14 +309,18 @@ pub fn normalize_characters_array<const GRID_SIZE: usize>(
 
     for result in iter {
         match result {
-            crate::prelude::NormalizedCharacterResult::Error(err) => return Err(err),
-            crate::prelude::NormalizedCharacterResult::RegularCharacter {
-                character: inner,
-                ..
-            } => {
-                characters.try_push(inner).map_err(|_| "Word is too long")?;
+            NormalizedCharacterResult::Error { message, .. } => return Err(message),
+            NormalizedCharacterResult::RegularCharacter { character, .. } => {
+                characters
+                    .try_push(character)
+                    .map_err(|_| "Word is too long")?;
             }
-            crate::prelude::NormalizedCharacterResult::Blank { .. } => {
+            NormalizedCharacterResult::SpecialCharacter { character, .. } => {
+                characters
+                    .try_push(character)
+                    .map_err(|_| "Word is too long")?;
+            }
+            NormalizedCharacterResult::Blank { .. } => {
                 //skip blanks
             }
         }
@@ -336,14 +340,16 @@ pub fn normalize_characters_vec(
 
     for result in iter {
         match result {
-            crate::prelude::NormalizedCharacterResult::Error(err) => return Err(err),
-            crate::prelude::NormalizedCharacterResult::RegularCharacter {
-                character: inner,
-                ..
-            } => {
-                characters.push(inner);
+            NormalizedCharacterResult::Error { message, .. } => {
+                return Err(message);
             }
-            crate::prelude::NormalizedCharacterResult::Blank { .. } => {
+            NormalizedCharacterResult::RegularCharacter { character, .. } => {
+                characters.push(character);
+            }
+            NormalizedCharacterResult::SpecialCharacter { character, .. } => {
+                characters.push(character);
+            }
+            NormalizedCharacterResult::Blank { .. } => {
                 //skip blanks
             }
         }

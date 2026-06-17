@@ -200,67 +200,61 @@ pub trait BasicWordTrait: Clone + Ord + PartialEq + PartialEq {
         hidden_text
     }
 
-    fn hinted_text(&self, hints: NonZeroUsize) -> String {
+    fn hinted_text(
+        &self,
+        hints: NonZeroUsize,
+        special_characters: &SpecialCharacters,
+        compact: bool,
+    ) -> String {
+        let underscore_char = if compact { "_" } else { " _" };
+
         //todo test and check special characters
         let mut result: String = Default::default();
         let mut hints_left = hints.get();
 
-        let unicode_graphemes =
-            unicode_segmentation::UnicodeSegmentation::graphemes(self.text().as_str(), true);
-
-        for grapheme in unicode_graphemes {
-            let mut normalized = unicode_normalization::UnicodeNormalization::nfd(grapheme);
-
-            let Some(c) = normalized.next() else {
-                continue;
-            };
-
-            let Ok(character) = Character::try_from(c) else {
-                result.push_str(grapheme);
-                continue;
-            };
-
-            if character.is_blank() || hints_left > 0 {
-                result.push_str(grapheme);
-                if !character.is_blank() {
-                    hints_left = hints_left.saturating_sub(1);
+        for ncr in NormalizedCharacterIterator::new(self.text().as_str(), special_characters) {
+            match ncr {
+                NormalizedCharacterResult::Error { grapheme, .. } => {
+                    //println!("Err '{grapheme}'");
+                    result.push_str(grapheme);
                 }
-            } else {
-                result.push_str(" _");
-            }
-        }
-
-        result
-    }
-
-    /// Same as hinted text but without spaces between underscores
-    fn hinted_text_compact(&self, hints: NonZeroUsize) -> String {
-        //todo test and check special characters
-        let mut result: String = Default::default();
-        let mut hints_left = hints.get();
-
-        let unicode_graphemes =
-            unicode_segmentation::UnicodeSegmentation::graphemes(self.text().as_str(), true);
-
-        for grapheme in unicode_graphemes {
-            let mut normalized = unicode_normalization::UnicodeNormalization::nfd(grapheme);
-
-            let Some(c) = normalized.next() else {
-                continue;
-            };
-
-            let Ok(character) = Character::try_from(c) else {
-                result.push_str(grapheme);
-                continue;
-            };
-
-            if character.is_blank() || hints_left > 0 {
-                result.push_str(grapheme);
-                if !character.is_blank() {
-                    hints_left = hints_left.saturating_sub(1);
+                NormalizedCharacterResult::RegularCharacter { grapheme, .. } => {
+                    match hints_left.checked_sub(1) {
+                        Some(new_hints_left) => {
+                            //println!("New hints {new_hints_left} '{grapheme}'");
+                            result.push_str(grapheme);
+                            hints_left = new_hints_left;
+                        }
+                        None => {
+                            //println!("No hints left '{grapheme}'");
+                            result.push_str(underscore_char);
+                        }
+                    }
                 }
-            } else {
-                result.push_str("_");
+
+                NormalizedCharacterResult::SpecialCharacter {
+                    character:_,
+                    first_grapheme,
+                    additional_graphemes,
+                    
+                } => match hints_left.checked_sub(1) {
+                    Some(new_hints_left) => {
+                        result.push_str(first_grapheme);
+                        for g in additional_graphemes {
+                            result.push_str(g);
+                        }
+                        
+                        hints_left = new_hints_left;
+                    }
+                    None => {
+                        result.push_str(underscore_char);
+                    }
+                },
+
+                NormalizedCharacterResult::Blank { grapheme } => {
+                    //println!("Blank '{grapheme}'");
+                    result.push_str(grapheme);
+                }
             }
         }
 
@@ -366,7 +360,7 @@ mod tests {
 
         assert_snapshot!(output)
     }
-    
+
     #[test]
     pub fn test_hinted_text() {
         let special_characters = SpecialCharacters::from_iter(["test"]);
@@ -375,8 +369,16 @@ mod tests {
         for word in ["Singleton", "Two Word", "Three-Word", "Attestation"] {
             let raw_word: DisplayWord<_> =
                 DisplayWord::<16>::from_string(word, &special_characters).unwrap();
-            let hinted = raw_word.hinted_text(NonZeroUsize::try_from(6).unwrap());
-            let hinted_compact = raw_word.hinted_text_compact(NonZeroUsize::try_from(6).unwrap());
+            let hinted = raw_word.hinted_text(
+                NonZeroUsize::try_from(6).unwrap(),
+                &special_characters,
+                false,
+            );
+            let hinted_compact = raw_word.hinted_text(
+                NonZeroUsize::try_from(6).unwrap(),
+                &special_characters,
+                true,
+            );
             writeln!(&mut output, "{word}: '{hinted}' / '{hinted_compact}'").unwrap();
         }
 
