@@ -152,6 +152,54 @@ pub trait BasicWordTrait: Clone + Ord + PartialEq + PartialEq {
     fn text(&self) -> Ustr;
     fn characters_slice(&self) -> &[Character];
 
+    /// The word lengths of the answer. No brackets
+    fn hidden_text(&self) -> String {
+        let mut hidden_text: String = Default::default();
+        let mut stack: usize = 0;
+
+        let unicode_graphemes =
+            unicode_segmentation::UnicodeSegmentation::graphemes(self.text().as_str(), true);
+
+        for grapheme in unicode_graphemes {
+            let mut normalized = unicode_normalization::UnicodeNormalization::nfd(grapheme);
+
+            let Some(c) = normalized.next() else {
+                continue;
+            };
+
+            let Ok(character) = Character::try_from(c) else {
+                continue;
+            };
+
+            if character.is_blank() {
+                if let Some(char_to_push) = {
+                    if ['-', '‐', '–', '—'].contains(&c) {
+                        Some('-')
+                    } else if c.is_ascii_whitespace() {
+                        Some(',') //use a comma instead of a space, like a crossword clue
+                    } else {
+                        None
+                    }
+                } {
+                    if stack > 0 {
+                        hidden_text += stack.to_string().as_str();
+                        stack = 0;
+                    }
+                    hidden_text.push(char_to_push);
+                }
+
+                // otherwise ignore the character in the hidden text
+            } else {
+                stack += 1;
+            }
+        }
+        if stack > 0 {
+            hidden_text += stack.to_string().as_str();
+        }
+
+        hidden_text
+    }
+
     fn hinted_text(&self, hints: NonZeroUsize) -> String {
         //todo test and check special characters
         let mut result: String = Default::default();
@@ -304,6 +352,21 @@ mod tests {
     };
     pub type Solution4x4 = Solution<16>;
 
+    #[test]
+    pub fn test_hidden_text() {
+        let special_characters = SpecialCharacters::from_iter(["test"]);
+
+        let mut output = String::new();
+        for word in ["Singleton", "Two Word", "Three-Word", "Attestation"] {
+            let raw_word: DisplayWord<_> =
+                DisplayWord::<16>::from_string(word, &special_characters).unwrap();
+            let hidden = raw_word.hidden_text();
+            writeln!(&mut output, "{word}: '{hidden}'").unwrap();
+        }
+
+        assert_snapshot!(output)
+    }
+    
     #[test]
     pub fn test_hinted_text() {
         let special_characters = SpecialCharacters::from_iter(["test"]);

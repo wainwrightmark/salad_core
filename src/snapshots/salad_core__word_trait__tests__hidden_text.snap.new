@@ -1,0 +1,9 @@
+---
+source: src/word_trait.rs
+assertion_line: 367
+expression: output
+---
+Singleton: '9'
+Two Word: '3,4'
+Three-Word: '5-4'
+Attestation: '11'
