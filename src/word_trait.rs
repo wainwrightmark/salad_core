@@ -1,5 +1,6 @@
 use arrayvec::ArrayVec;
 use std::marker::PhantomData;
+use std::num::NonZeroUsize;
 use ustr::Ustr;
 
 use crate::grid_layout::GridLayout;
@@ -267,6 +268,58 @@ pub trait WordTrait<const GRID_SIZE: usize>: BasicWordTrait {
 
         hidden_text
     }
+
+    fn hinted_text(&self, hints: NonZeroUsize) -> String {
+        //todo test and check special characters
+        let mut result: String = Default::default();
+        let mut hints_left = hints.get();
+
+        let unicode_graphemes =
+            unicode_segmentation::UnicodeSegmentation::graphemes(self.text().as_str(), true);
+
+        for grapheme in unicode_graphemes {
+            let mut normalized = unicode_normalization::UnicodeNormalization::nfd(grapheme);
+
+            let Some(c) = normalized.next() else {
+                continue;
+            };
+
+            let Ok(character) = Character::try_from(c) else {
+                result.push_str(grapheme);
+                continue;
+            };
+
+            if character.is_blank() || hints_left > 0 {
+                result.push_str(grapheme);
+                if !character.is_blank(){
+                    hints_left = hints_left.saturating_sub(1);
+                }
+            } else {
+                result.push_str(" _");
+            }
+        }
+
+        result
+    }
+
+    // /// Same as hinted text but without spaces between underscores
+    // fn hinted_text_compact(&self, hints: NonZeroUsize) -> String {
+    //     let mut result: String = Default::default();
+    //     let mut hints_left = hints.get();
+
+    //     for grapheme in self.graphemes.iter() {
+    //         if !grapheme.is_game_char || hints_left > 0 {
+    //             result.push_str(grapheme.grapheme.as_str());
+    //             if grapheme.is_game_char {
+    //                 hints_left = hints_left.saturating_sub(1);
+    //             }
+    //         } else {
+    //             result.push_str("ˍ");
+    //         }
+    //     }
+
+    //     result
+    // }
 }
 
 #[cfg(test)]
