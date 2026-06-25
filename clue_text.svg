@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg"" style=" background:white" viewBox="0 0 200 50">
+<text font-size=12 font-family=montserrat fill=#000000 dominant-baseline="central" style="text-anchor: middle;">
+<tspan x=100.0 y=16.7>
+<tspan font-weight="500" font-style="normal">Hello World </tspan>
+<tspan font-weight="500" font-style="italic"> italics </tspan>
+<tspan font-weight="700" font-style="italic"> bold </tspan>
+</tspan>
+<tspan x=100.0 y=33.3>
+<tspan font-weight="700" font-style="italic"> </tspan>
+<tspan font-weight="800">ANSWERS</tspan>
+<tspan font-weight="700" font-style="italic"> answer </tspan>
+<tspan font-weight="800">1</tspan>
+<tspan font-weight="700" font-style="italic"> number</tspan>
+</tspan>
+</text>
+            
+</svg>
