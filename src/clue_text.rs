@@ -81,6 +81,8 @@ pub enum ClueTextSegment {
     AnswerNumber(usize),
     Text(String),
     TextModifier(TextModifier),
+
+    WordLength(String)
 }
 
 impl ClueTextSegment{
@@ -90,6 +92,7 @@ impl ClueTextSegment{
             ClueTextSegment::AnswerNumber(n) => if *n == 10 {2} else{1},
             ClueTextSegment::Text(text) => text.len(),
             ClueTextSegment::TextModifier(_) => 0,
+            ClueTextSegment::WordLength(w) => w.len(),
         }
     }
 
@@ -111,6 +114,7 @@ impl ClueTextSegment{
                  result
             },
             ClueTextSegment::TextModifier(_) => None,
+            ClueTextSegment::WordLength(_) => None,
         }
     }
 }
@@ -134,12 +138,13 @@ impl Display for ClueTextSegment {
         match self {
             
             ClueTextSegment::Answers => f.write_str("\\a"),
+            ClueTextSegment::WordLength(wl) => wl.fmt(f),
             ClueTextSegment::AnswerNumber(n) => {
                 let n = n % 10;
                 f.write_char('\\')?;
                 n.fmt(f)
             }
-            ClueTextSegment::Text(ustr) => ustr.fmt(f),
+            ClueTextSegment::Text(text) => text.fmt(f),
             ClueTextSegment::TextModifier(modifier) => {
                 let c = match modifier {
                     // TextModifier::Normal => NORMAL_CONTROL_CHARACTER,
@@ -298,11 +303,11 @@ impl ClueText {
                     ClueTextSegment::AnswerNumber(answer_number) => {
                         writeln!(&mut svg, r#"<tspan font-weight="800">{answer_number}</tspan>"#).unwrap();
                     },
-                    ClueTextSegment::Text(ustr) => {
+                    ClueTextSegment::Text(text) => {
                         let weight = if is_bold {700} else {500};
                         let font_style = if is_italic {"italic"} else{"normal"};
 
-                        writeln!(&mut svg, r#"<tspan font-weight="{weight}" font-style="{font_style}">{ustr}</tspan>"#).unwrap();
+                        writeln!(&mut svg, r#"<tspan font-weight="{weight}" font-style="{font_style}">{text}</tspan>"#).unwrap();
                     },
                     ClueTextSegment::TextModifier(text_modifier) => {
                         match text_modifier{
@@ -310,6 +315,9 @@ impl ClueText {
                             TextModifier::Italic => is_italic = !is_italic,
                         }
                     },
+                    ClueTextSegment::WordLength(wl)=>{
+                        writeln!(&mut svg, r#"<tspan font-weight="500" font-style="normal">{wl}</tspan>"#).unwrap();
+                    }
                 }
             }
 
