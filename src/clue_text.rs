@@ -4,8 +4,10 @@ use std::{
 };
 
 use bevy_color::prelude::Srgba;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct ClueText {
     pub lines: Vec<ClueTextLine> 
 }
@@ -63,7 +65,8 @@ impl ClueText{
         })    }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct ClueTextLine(Vec<ClueTextSegment>);
 
 impl ClueTextLine{
@@ -72,7 +75,7 @@ impl ClueTextLine{
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ClueTextSegment {
     Answers,
     AnswerNumber(usize),
@@ -112,7 +115,7 @@ impl ClueTextSegment{
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum TextModifier {
     // Normal,
     Bold,
