@@ -147,7 +147,7 @@ impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>> Iterator
     }
 }
 
-pub trait BasicWordTrait: Clone + Ord + PartialEq + PartialEq {
+pub trait BasicWordTrait: Clone + PartialEq + PartialOrd {
     //todo move some default methods from WordTrait here
     fn text(&self) -> Ustr;
     fn characters_slice(&self) -> &[Character];
