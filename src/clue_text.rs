@@ -10,8 +10,67 @@ pub struct ClueText {
     pub lines: Vec<ClueTextLine> 
 }
 
+
+impl ClueText{
+    pub fn try_split_lines(&self, max_line_length: usize, max_lines: usize)-> Option<Self>{
+        let line_count = self.lines.len();
+        let longest_line = self.lines.iter().map(|x|x.line_length()).max().unwrap_or_default();
+
+        if longest_line <= max_line_length && line_count <= max_lines{
+            return Some(self.clone());
+        }
+
+        let total_characters: usize = self.lines.iter().map(|x|x.line_length()).sum();
+        let max_characters = max_line_length * max_lines;
+        if total_characters > max_characters{
+            return None;
+        }
+
+        let mut new_lines = vec![];
+        let mut current_line_segments = vec![];
+        let mut current_line_characters = 0;
+        
+        let mut segments_iter = self.lines.clone().into_iter().flat_map(|line|line.0.into_iter()).peekable();
+
+        while let Some(clue_text_segment) = segments_iter.peek_mut() {
+            let segment_chars = clue_text_segment.num_chars();
+            if current_line_characters + segment_chars <= max_line_length{
+                current_line_segments.push(segments_iter.next().unwrap());
+                current_line_characters += segment_chars;
+                continue;
+            }
+
+            match clue_text_segment.try_remove_first_words(max_line_length - current_line_characters){
+                Some(extracted_word) => {                    
+                    current_line_segments.push(extracted_word);                    
+                },
+                None => {},
+            }
+
+            new_lines.push(ClueTextLine(std::mem::take(&mut current_line_segments)));
+            if new_lines.len() >= max_lines{
+                return None;
+            }
+            current_line_characters= 0;
+                    
+        }
+
+        new_lines.push(ClueTextLine(std::mem::take(&mut current_line_segments)));
+
+
+        Some(Self{
+            lines: new_lines
+        })    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct ClueTextLine(Vec<ClueTextSegment>);
+
+impl ClueTextLine{
+    pub fn line_length(&self)-> usize{
+        self.0.iter().map(|x|x.num_chars()).sum()
+    }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ClueTextSegment {
@@ -19,6 +78,38 @@ pub enum ClueTextSegment {
     AnswerNumber(usize),
     Text(String),
     TextModifier(TextModifier),
+}
+
+impl ClueTextSegment{
+    pub fn num_chars(&self)-> usize{
+        match self{
+            ClueTextSegment::Answers => 7,
+            ClueTextSegment::AnswerNumber(n) => if *n == 10 {2} else{1},
+            ClueTextSegment::Text(text) => text.len(),
+            ClueTextSegment::TextModifier(_) => 0,
+        }
+    }
+
+    ///Split off the first word if possible
+    pub fn try_remove_first_words(&mut self,max_first_segment_len: usize)-> Option<Self>{
+        match self{
+            ClueTextSegment::Answers => None,
+            ClueTextSegment::AnswerNumber(_) => None,
+            ClueTextSegment::Text(text) => {
+
+                let (_,(char_index,_)) = text.char_indices().enumerate()
+                .filter(|(_total_chars,(_char_index, char))|char.is_whitespace())
+                .take_while(|(total_chars,(_char_index, _char))|*total_chars <= max_first_segment_len).next()?;
+
+                let (l, r) = text.split_at(char_index);
+                 
+                 let result = Some(Self::Text(l.to_string()));
+                 *text = r.to_string();
+                 result
+            },
+            ClueTextSegment::TextModifier(_) => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -285,10 +376,21 @@ mod tests {
                 std::fs::write(path, svg.clone()).unwrap();
                 insta::assert_snapshot!("test_clues_svg", svg);
             }
-        }
+        }        
+    }
 
-        
 
-        
+
+    #[test]
+    fn test_line_split(){
+        let text = r#"Hello World \i italics \b bold \a answer \1 number"#;
+
+        let clue = ClueText::from_str(text).unwrap();
+        let clue =clue.try_split_lines(30, 2).unwrap();
+
+        let expected = r#"Hello World \i italics \b bold \n\a answer \1 number"#;
+
+        assert_eq!(expected, clue.to_string());
+
     }
 }
