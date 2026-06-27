@@ -4,6 +4,7 @@ use std::{
 };
 
 use bevy_color::prelude::Srgba;
+use const_sized_bit_set::prelude::BitSet32;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -14,6 +15,19 @@ pub struct ClueText {
 
 
 impl ClueText{
+
+    pub fn referenced_answers(&self)-> BitSet32{
+        let mut set = BitSet32::EMPTY;
+        for line in self.lines.iter(){
+            for segment in line.0.iter(){
+                if let ClueTextSegment::AnswerNumber(number) = segment {
+                    set.insert_const(*number as u32);
+                }
+            }
+        }
+        set
+    }
+
     pub fn try_split_lines(&self, max_line_length: usize, max_lines: usize)-> Option<Self>{
         let line_count = self.lines.len();
         let longest_line = self.lines.iter().map(|x|x.line_length()).max().unwrap_or_default();
