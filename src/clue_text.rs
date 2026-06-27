@@ -260,7 +260,18 @@ pub struct ClueTextSVGArgs {
     pub fill: Srgba,
 }
 
+
 impl ClueText {
+
+    pub fn push_segment(&mut self, segment: ClueTextSegment){
+        match self.lines.last_mut() {
+            Some(line) => line.0.push(segment),
+            None => {
+                self.lines.push(ClueTextLine(vec![segment]));
+            },
+        }
+    }
+
     pub fn write_svg_element(&self, args: ClueTextSVGArgs) -> String {
         let ClueTextSVGArgs {
             x,
