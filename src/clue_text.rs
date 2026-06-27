@@ -19,12 +19,14 @@ impl ClueText{
         let longest_line = self.lines.iter().map(|x|x.line_length()).max().unwrap_or_default();
 
         if longest_line <= max_line_length && line_count <= max_lines{
+            
             return Some(self.clone());
         }
 
         let total_characters: usize = self.lines.iter().map(|x|x.line_length()).sum();
         let max_characters = max_line_length * max_lines;
         if total_characters > max_characters{
+            
             return None;
         }
 
@@ -41,16 +43,27 @@ impl ClueText{
                 current_line_characters += segment_chars;
                 continue;
             }
+            
+            
+            
 
             match clue_text_segment.try_remove_first_words(max_line_length - current_line_characters){
                 Some(extracted_word) => {                    
+                    println!("Appended word: '{}'", extracted_word.to_string());
                     current_line_segments.push(extracted_word);                    
                 },
-                None => {},
+                None => {
+                    
+                },
             }
 
+            
+
+            
+
             new_lines.push(ClueTextLine(std::mem::take(&mut current_line_segments)));
-            if new_lines.len() >= max_lines{
+            if new_lines.len() > max_lines{
+                
                 return None;
             }
             current_line_characters= 0;
@@ -58,6 +71,10 @@ impl ClueText{
         }
 
         new_lines.push(ClueTextLine(std::mem::take(&mut current_line_segments)));
+        if new_lines.len() > max_lines{
+                
+                return None;
+            }
 
 
         Some(Self{
@@ -105,7 +122,7 @@ impl ClueTextSegment{
 
                 let (_,(char_index,_)) = text.char_indices().enumerate()
                 .filter(|(_total_chars,(_char_index, char))|char.is_whitespace())
-                .take_while(|(total_chars,(_char_index, _char))|*total_chars <= max_first_segment_len).next()?;
+                .take_while(|(total_chars,(_char_index, _char))|*total_chars <= max_first_segment_len).last()?;
 
                 let (l, r) = text.split_at(char_index);
                  
@@ -411,6 +428,20 @@ mod tests {
         let clue =clue.try_split_lines(30, 2).unwrap();
 
         let expected = r#"Hello World \i italics \b bold \n\a answer \1 number"#;
+
+        assert_eq!(expected, clue.to_string());
+
+    }
+    
+    #[test]
+    fn test_line_split2(){
+        let text = r#"You might pick it up at a coffee shop"#;
+
+        let mut clue = ClueText::from_str(text).unwrap();
+        clue.push_segment(crate::clue_text::ClueTextSegment::WordLength(format!("(5)")));
+        let clue =clue.try_split_lines(30, 2).unwrap();
+
+        let expected = r#"You might pick it up at a\n coffee shop(5)"#;
 
         assert_eq!(expected, clue.to_string());
 
