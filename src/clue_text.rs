@@ -230,6 +230,10 @@ impl FromStr for ClueText {
                 segments.push(ClueTextSegment::Text(left.to_string()));
             }
 
+            if right.is_empty(){
+                anyhow::bail!("Missing Control Character.");
+            }
+
             let c = &right[0..1];
             let r = &right[1..];
 
