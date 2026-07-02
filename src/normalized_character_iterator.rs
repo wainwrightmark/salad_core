@@ -74,7 +74,7 @@ impl<'s, 'special> Iterator for NormalizedCharacterIterator<'s, 'special> {
                             let Some(next_grapheme) = graphemes2.next() else {
                                 continue 'special;
                             };
-                            if !sc_str.starts_with(next_grapheme) {
+                            if !sc_str[0..next_grapheme.len()].eq_ignore_ascii_case(next_grapheme) {
                                 continue 'special;
                             }
                             grapheme_count += 1;

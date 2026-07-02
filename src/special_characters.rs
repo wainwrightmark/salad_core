@@ -195,6 +195,8 @@ mod tests {
     #[test_case("abc", "abcde", "0DE")]
     //spellchecker:disable-next-line
     #[test_case("ab", "abacuses abandon", "0ACUSES_0ANDON")]
+    #[test_case("HAND", "chandelier", "C0ELIER")]
+    #[test_case("hand", "SHANDY", "S0Y")]
     fn test_normalized_character_iterator(special: &str, input: &str, expected: &str) {
         let special_characters = SpecialCharacters::from_iter([special]);
 
