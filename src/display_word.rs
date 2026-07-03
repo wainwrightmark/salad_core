@@ -7,9 +7,6 @@ use itertools::Itertools;
 use std::{collections::BTreeMap, sync::LazyLock};
 use ustr::Ustr;
 
-// pub type DisplayWord4x4 = DisplayWord<4, 16>;
-// pub type DisplayWord5x5 = DisplayWord<5, 25>;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DisplayWord<const GRID_SIZE: usize> {
     /// The characters needed to solve the word
@@ -150,42 +147,6 @@ static COLORS_MAP: LazyLock<BTreeMap<&[Character], bevy_color::Srgba>> = LazyLoc
 });
 
 impl<const GRID_SIZE: usize> DisplayWord<GRID_SIZE> {
-    // pub fn hinted_text(&self, hints: NonZeroUsize) -> String {
-    //     let mut result: String = Default::default();
-    //     let mut hints_left = hints.get();
-
-    //     for grapheme in self.graphemes.iter() {
-    //         if !grapheme.is_game_char || hints_left > 0 {
-    //             result.push_str(grapheme.grapheme.as_str());
-    //             if grapheme.is_game_char {
-    //                 hints_left = hints_left.saturating_sub(1);
-    //             }
-    //         } else {
-    //             result.push_str(" _");
-    //         }
-    //     }
-
-    //     result
-    // }
-
-    // /// Same as hinted text but without spaces between underscores
-    // pub fn hinted_text_compact(&self, hints: NonZeroUsize) -> String {
-    //     let mut result: String = Default::default();
-    //     let mut hints_left = hints.get();
-
-    //     for grapheme in self.graphemes.iter() {
-    //         if !grapheme.is_game_char || hints_left > 0 {
-    //             result.push_str(grapheme.grapheme.as_str());
-    //             if grapheme.is_game_char {
-    //                 hints_left = hints_left.saturating_sub(1);
-    //             }
-    //         } else {
-    //             result.push('ˍ');
-    //         }
-    //     }
-
-    //     result
-    // }
 
     pub fn custom_color(&self) -> Option<bevy_color::Srgba> {
         COLORS_MAP.get(&self.characters.as_slice()).cloned()
@@ -315,10 +276,6 @@ impl<const GRID_SIZE: usize> DisplayWord<GRID_SIZE> {
 
         if stack > 0 {
             hidden_text += stack.to_string().as_str();
-        }
-
-        if characters.len() <= 3 {
-            return Err("Word has 3 or fewer characters");
         }
 
         Ok(Self {
