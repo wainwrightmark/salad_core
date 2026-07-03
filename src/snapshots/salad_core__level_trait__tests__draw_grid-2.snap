@@ -1,0 +1,39 @@
+---
+source: src/level_trait.rs
+expression: svg
+---
+<svg xmlns="http://www.w3.org/2000/svg" style="background:white" viewBox="0 0 400 400"  >
+<rect width="400" height="400" x="0" y="0"  rx="0" stroke="#221f21" stroke-width="3" fill="transparent" style="fill:none"> </rect>
+<rect width="100" height="100" x="0" y="0"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5000,5000) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">C </text>
+<rect width="100" height="100" x="100" y="0"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5100,5000) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">H </text>
+<rect width="100" height="100" x="200" y="0"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5200,5000) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">S </text>
+<rect width="100" height="100" x="300" y="0"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5300,5000) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">T </text>
+<rect width="100" height="100" x="0" y="100"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5000,5100) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">W </text>
+<rect width="100" height="100" x="100" y="100"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5100,5100) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">E </text>
+<rect width="100" height="100" x="200" y="100"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5200,5100) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">L </text>
+<rect width="100" height="100" x="300" y="100"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5300,5100) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">A </text>
+<rect width="100" height="100" x="0" y="200"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5000,5200) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">D </text>
+<rect width="100" height="100" x="100" y="200"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5100,5200) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">A </text>
+<rect width="100" height="100" x="200" y="200"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5200,5200) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">B </text>
+<rect width="100" height="100" x="300" y="200"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5300,5200) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">F </text>
+<rect width="100" height="100" x="0" y="300"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5000,5300) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">R </text>
+<rect width="100" height="100" x="100" y="300"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5100,5300) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">R </text>
+<rect width="100" height="100" x="200" y="300"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5200,5300) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">O </text>
+<rect width="100" height="100" x="300" y="300"  rx="0" stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </rect>
+<text transform="translate(5300,5300) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">S </text>
+</svg>

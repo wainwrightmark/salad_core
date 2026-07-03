@@ -3,6 +3,7 @@ pub mod complete_solve;
 pub mod designed_level;
 pub mod display_word;
 pub mod draw_paper;
+pub mod draw_grid;
 pub mod grid;
 pub mod grid_layout;
 pub mod grid_tile;

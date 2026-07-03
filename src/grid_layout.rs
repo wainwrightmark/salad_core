@@ -134,15 +134,7 @@ pub trait GridLayout<const GRID_SIZE: usize>:
 
     fn tile_position_u8(tile: GridTile) -> U8Vec2;
 
-    fn tile_position(tile: GridTile, tile_size: f32, from_centre: bool) -> glam::Vec2 {
-        let p = Self::tile_position_u8(tile);
-        let p = p.as_vec2() * tile_size * 0.5;
-        if from_centre {
-            p + Vec2::splat(0.5 * tile_size)
-        } else {
-            p
-        }
-    }
+    fn tile_position(tile: GridTile, tile_size: f32, from_centre: bool) -> glam::Vec2;
 
     fn get_tile_from_position(position: Vec2, tile_size: f32, sensitivity: f32)
     -> Option<GridTile>;
@@ -343,7 +335,7 @@ impl GridLayout<19> for Hexagon19FatLayout {
     }
 
     fn tile_position_u8(tile: GridTile) -> U8Vec2 {
-        HEXAGON_19_POSITIONS[tile.inner_usize()]
+        HEXAGON_19_FAT_POSITIONS[tile.inner_usize()]
     }
 
     fn board_dimensions(tile_radius: f32) -> Vec2 {
@@ -663,7 +655,7 @@ impl GridLayout<19> for Hexagon19ThinLayout {
     }
 
     fn tile_position_u8(tile: GridTile) -> U8Vec2 {
-        HEXAGON_19_ROTATED_POSITIONS[tile.inner_usize()]
+        HEXAGON_19_THIN_POSITIONS[tile.inner_usize()]
     }
 
     fn board_dimensions(tile_radius: f32) -> Vec2 {
@@ -677,7 +669,8 @@ impl GridLayout<19> for Hexagon19ThinLayout {
         let p = Self::tile_position_u8(tile);
         let p = p.as_vec2() * tile_diameter * 0.25 * Vec2 { x: 1.0, y: SQRT_3 };
         if from_centre {
-            p + Vec2::new(tile_diameter * 0.25 * SQRT_3, tile_diameter * 0.5)
+            
+            p + Vec2::new(tile_diameter * 0.5, tile_diameter * 0.25  * SQRT_3)
         } else {
             p
         }
@@ -1049,6 +1042,16 @@ impl GridLayout<16> for Square16Layout {
         .into_iter()
     }
 
+    fn tile_position(tile: GridTile, tile_size: f32, from_centre: bool) -> glam::Vec2 {
+        let p = Self::tile_position_u8(tile);
+        let p = p.as_vec2() * tile_size * 0.5;
+        if from_centre {
+            p + Vec2::splat(0.5 * tile_size)
+        } else {
+            p
+        }
+    }
+
     fn get_tile_from_position(
         position: Vec2,
         tile_size: f32,
@@ -1096,7 +1099,7 @@ const fn chebyshev_distance(a: U8Vec2, b: U8Vec2) -> u8 {
     if x >= y { x } else { y }
 }
 
-const HEXAGON_19_POSITIONS: [U8Vec2; 19] = [
+const HEXAGON_19_FAT_POSITIONS: [U8Vec2; 19] = [
     U8Vec2 { x: 2, y: 0 },
     U8Vec2 { x: 4, y: 0 },
     U8Vec2 { x: 6, y: 0 },
@@ -1118,26 +1121,26 @@ const HEXAGON_19_POSITIONS: [U8Vec2; 19] = [
     U8Vec2 { x: 6, y: 8 },
 ];
 
-const HEXAGON_19_ROTATED_POSITIONS: [U8Vec2; 19] = [
-    U8Vec2 { x: 7, y: 0 },  //0
-    U8Vec2 { x: 10, y: 1 }, //1
-    U8Vec2 { x: 13, y: 2 }, //2
-    U8Vec2 { x: 4, y: 1 },  //3
-    U8Vec2 { x: 7, y: 2 },  //4
-    U8Vec2 { x: 10, y: 3 }, //5
-    U8Vec2 { x: 13, y: 4 }, //6
-    U8Vec2 { x: 1, y: 2 },  //7
-    U8Vec2 { x: 4, y: 3 },  //8
-    U8Vec2 { x: 7, y: 4 },  //9
-    U8Vec2 { x: 10, y: 5 }, //10
-    U8Vec2 { x: 13, y: 6 }, //11
-    U8Vec2 { x: 1, y: 4 },  //12
-    U8Vec2 { x: 4, y: 5 },  //13
-    U8Vec2 { x: 7, y: 6 },  //14
-    U8Vec2 { x: 10, y: 7 }, //15
-    U8Vec2 { x: 1, y: 6 },  //16
-    U8Vec2 { x: 4, y: 7 },  //17
-    U8Vec2 { x: 7, y: 8 },  //18
+const HEXAGON_19_THIN_POSITIONS: [U8Vec2; 19] = [
+    U8Vec2 { x: 6, y: 0 },  //0
+    U8Vec2 { x: 9, y: 1 }, //1
+    U8Vec2 { x: 12, y: 2 }, //2
+    U8Vec2 { x: 3, y: 1 },  //3
+    U8Vec2 { x: 6, y: 2 },  //4
+    U8Vec2 { x: 9, y: 3 }, //5
+    U8Vec2 { x: 12, y: 4 }, //6
+    U8Vec2 { x: 0, y: 2 },  //7
+    U8Vec2 { x: 3, y: 3 },  //8
+    U8Vec2 { x: 6, y: 4 },  //9
+    U8Vec2 { x: 9, y: 5 }, //10
+    U8Vec2 { x: 12, y: 6 }, //11
+    U8Vec2 { x: 0, y: 4 },  //12
+    U8Vec2 { x: 3, y: 5 },  //13
+    U8Vec2 { x: 6, y: 6 },  //14
+    U8Vec2 { x: 9, y: 7 }, //15
+    U8Vec2 { x: 0, y: 6 },  //16
+    U8Vec2 { x: 3, y: 7 },  //17
+    U8Vec2 { x: 6, y: 8 },  //18
 ];
 
 const SQUARE_16_POSITIONS: [U8Vec2; 16] = [
@@ -1187,11 +1190,11 @@ const HEXAGON_19_ADJACENCIES: [GridSet; 19] = {
 
     let mut a_index = 0usize;
     while a_index < 19 {
-        let a = HEXAGON_19_POSITIONS[a_index];
+        let a = HEXAGON_19_FAT_POSITIONS[a_index];
 
         let mut b_index = a_index + 1;
         while b_index < 19 {
-            let b = HEXAGON_19_POSITIONS[b_index];
+            let b = HEXAGON_19_FAT_POSITIONS[b_index];
 
             if chebyshev_distance(a, b) <= 2 {
                 sets[a_index].insert_const(b_index as u32);

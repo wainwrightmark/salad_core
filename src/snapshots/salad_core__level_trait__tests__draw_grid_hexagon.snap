@@ -1,0 +1,44 @@
+---
+source: src/level_trait.rs
+expression: svg.clone()
+---
+<svg xmlns="http://www.w3.org/2000/svg" style="background:white" viewBox="0 0 400 433.0127"  >
+<polygon points="250.00,43.30 225.00,86.60 175.00,86.60 150.00,43.30 175.00,-0.00 225.00,0.00 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(200,43.30127) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">C </text>
+<polygon points="325.00,86.60 300.00,129.90 250.00,129.90 225.00,86.60 250.00,43.30 300.00,43.30 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(275,86.60254) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">R </text>
+<polygon points="400.00,129.90 375.00,173.21 325.00,173.21 300.00,129.90 325.00,86.60 375.00,86.60 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(350,129.90381) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">E </text>
+<polygon points="175.00,86.60 150.00,129.90 100.00,129.90 75.00,86.60 100.00,43.30 150.00,43.30 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(125,86.60254) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">H </text>
+<polygon points="250.00,129.90 225.00,173.21 175.00,173.21 150.00,129.90 175.00,86.60 225.00,86.60 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(200,129.90381) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">A </text>
+<polygon points="325.00,173.21 300.00,216.51 250.00,216.51 225.00,173.21 250.00,129.90 300.00,129.90 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(275,173.20508) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">U </text>
+<polygon points="400.00,216.51 375.00,259.81 325.00,259.81 300.00,216.51 325.00,173.21 375.00,173.21 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(350,216.50635) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">S </text>
+<polygon points="100.00,129.90 75.00,173.21 25.00,173.21 0.00,129.90 25.00,86.60 75.00,86.60 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(50,129.90381) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">O </text>
+<polygon points="175.00,173.21 150.00,216.51 100.00,216.51 75.00,173.21 100.00,129.90 150.00,129.90 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(125,173.20508) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">R </text>
+<polygon points="250.00,216.51 225.00,259.81 175.00,259.81 150.00,216.51 175.00,173.21 225.00,173.21 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(200,216.50635) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">L </text>
+<polygon points="325.00,259.81 300.00,303.11 250.00,303.11 225.00,259.81 250.00,216.51 300.00,216.51 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(275,259.80762) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">A </text>
+<polygon points="400.00,303.11 375.00,346.41 325.00,346.41 300.00,303.11 325.00,259.81 375.00,259.81 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(350,303.1089) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">D </text>
+<polygon points="100.00,216.51 75.00,259.81 25.00,259.81 0.00,216.51 25.00,173.21 75.00,173.21 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(50,216.50635) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">I </text>
+<polygon points="175.00,259.81 150.00,303.11 100.00,303.11 75.00,259.81 100.00,216.51 150.00,216.51 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(125,259.80762) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">O </text>
+<polygon points="250.00,303.11 225.00,346.41 175.00,346.41 150.00,303.11 175.00,259.81 225.00,259.81 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(200,303.1089) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">M </text>
+<polygon points="325.00,346.41 300.00,389.71 250.00,389.71 225.00,346.41 250.00,303.11 300.00,303.11 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(275,346.41016) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">E </text>
+<polygon points="100.00,303.11 75.00,346.41 25.00,346.41 0.00,303.11 25.00,259.81 75.00,259.81 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(50,303.1089) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">S </text>
+<polygon points="175.00,346.41 150.00,389.71 100.00,389.71 75.00,346.41 100.00,303.11 150.00,303.11 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(125,346.41016) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">T </text>
+<polygon points="250.00,389.71 225.00,433.01 175.00,433.01 150.00,389.71 175.00,346.41 225.00,346.41 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<text transform="translate(200,389.71143) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">R </text>
+</svg>

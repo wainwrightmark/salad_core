@@ -117,6 +117,18 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         true
     }
 
+    fn draw_grid_svg(
+        &self,
+        special_characters: &SpecialCharacters,
+    )
+    -> String{
+        crate::draw_grid::draw::<GRID_SIZE, Self::Layout>(
+            self,
+            
+            special_characters,
+        )
+    }
+
     fn draw_paper_svg(
         &self,
         title: &str,
@@ -536,6 +548,77 @@ mod tests {
         let is_arizona_safe = LevelTrait::is_arizona_safe(&level2);
         assert!(is_arizona_safe, "Should be safe")
     }
+
+    #[test]
+    pub fn test_draw_grid(){
+         let level1 = crate::designed_level::DesignedLevel::<16, Square16Layout>::from_tsv_line(
+            // spellchecker:disable-next-line
+            "CHSTWELADABFRROS\tFurniture\tchest\tshelf\tsofa\ttable\twardrobe",
+            true,
+        )
+        .unwrap();
+
+        let svg = level1.draw_grid_svg(            
+            &crate::special_characters::SpecialCharacters::NONE,
+        );
+
+        let svg = svg.replace(
+            r#"xmlns="http://www.w3.org/2000/svg""#,
+            r#"xmlns="http://www.w3.org/2000/svg" style="background:white""#,
+        );
+
+        let path = "furniture_grid.svg";
+
+        match std::panic::catch_unwind(|| {
+            insta::assert_snapshot!(svg.clone());
+        }) {
+            Ok(()) => {
+                if !std::fs::exists("path").unwrap() {
+                    std::fs::write(path, svg.clone()).unwrap();
+                }
+            }
+            Err(_err) => {
+                std::fs::write(path, svg.clone()).unwrap();
+                insta::assert_snapshot!(svg);
+            }
+        }
+    }
+    
+    #[test]
+    pub fn test_draw_grid_hexagon(){
+        let level1 = crate::designed_level::DesignedLevel::<19, Hexagon19ThinLayout>::from_tsv_line(
+            // spellchecker:disable-next-line
+            r#"CREHAUSORLADIOMESTR		aroma[You might pick it up at a coffee shop]	choir[Ones who agree with you metaphorically]	Christmas[A famous father]	Carol[Number by a door]	crusade[Campaign religiously]	Treasure[Something found at "X"]	measure[Piano Bar]	medal[Come third or better]	salome[Dancer Of The Seven Veils]	tremor[It's a fault's fault]"#,
+            true
+        )
+        .unwrap();
+
+        let svg = level1.draw_grid_svg(            
+            &crate::special_characters::SpecialCharacters::NONE,
+        );
+
+        let svg = svg.replace(
+            r#"xmlns="http://www.w3.org/2000/svg""#,
+            r#"xmlns="http://www.w3.org/2000/svg" style="background:white""#,
+        );
+
+        let path = "furniture_grid_hexagon.svg";
+
+        match std::panic::catch_unwind(|| {
+            insta::assert_snapshot!(svg.clone());
+        }) {
+            Ok(()) => {
+                if !std::fs::exists("path").unwrap() {
+                    std::fs::write(path, svg.clone()).unwrap();
+                }
+            }
+            Err(_err) => {
+                std::fs::write(path, svg.clone()).unwrap();
+                insta::assert_snapshot!(svg);
+            }
+        }
+    }
+
 
     #[test]
     pub fn test_paper_svg() {
