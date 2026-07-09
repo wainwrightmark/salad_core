@@ -178,7 +178,7 @@ impl Character {
                 };
 
                 match special_characters.get_from_special_index(special_index) {
-                    Some(x) => x.as_str(),
+                    Some(x) => x.text.as_str(),
                     None => "?",
                 }
             }
@@ -460,7 +460,7 @@ mod tests {
     };
     use itertools::Itertools;
     use test_case::test_case;
-    use ustr::Ustr;
+    
     /* spellchecker:disable */
     #[test_case("abcd", "ab cd")]
     #[test_case("dali", "Dalí")]
@@ -477,8 +477,7 @@ mod tests {
 
     #[test]
     fn test_special_characters() {
-        let mut sc = SpecialCharacters::NONE;
-        sc.try_push(Ustr::from("ant")).unwrap();
+        let sc = SpecialCharacters::try_from_iter(["ant"]).unwrap();
 
         let char_arr = normalize_characters_vec("antielephant", &sc).unwrap();
 

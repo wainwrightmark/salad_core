@@ -348,7 +348,7 @@ mod tests {
 
     #[test]
     pub fn test_hidden_text() {
-        let special_characters = SpecialCharacters::from_iter(["test"]);
+        let special_characters = SpecialCharacters::try_from_iter(["test"]).unwrap();
 
         let mut output = String::new();
         for word in ["Singleton", "Two Word", "Three-Word", "Attestation"] {
@@ -363,7 +363,7 @@ mod tests {
 
     #[test]
     pub fn test_hinted_text() {
-        let special_characters = SpecialCharacters::from_iter(["test"]);
+        let special_characters = SpecialCharacters::try_from_iter(["test"]).unwrap();
 
         let mut output = String::new();
         for word in ["Singleton", "Two Word", "Three-Word", "Attestation"] {

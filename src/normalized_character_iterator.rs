@@ -61,7 +61,7 @@ impl<'s, 'special> Iterator for NormalizedCharacterIterator<'s, 'special> {
             'special: for (special_character_index, sc) in
                 self.special_characters.0.iter().enumerate()
             {
-                let mut sc_str = sc.as_str();
+                let mut sc_str = sc.text.as_str();
 
                 if grapheme.len() < sc_str.len()
                     && sc_str[..grapheme.len()].eq_ignore_ascii_case(grapheme)

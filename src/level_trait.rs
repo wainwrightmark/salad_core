@@ -41,8 +41,6 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
             None => "".to_string(),
         };
 
-        let special_characters = special_characters.format_for_url();
-
         format!("{grid}{special_characters}\t{title}{extra}{colors}\t{words}")
     }
 
@@ -117,16 +115,8 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         true
     }
 
-    fn draw_grid_svg(
-        &self,
-        special_characters: &SpecialCharacters,
-    )
-    -> String{
-        crate::draw_grid::draw::<GRID_SIZE, Self::Layout>(
-            self,
-            
-            special_characters,
-        )
+    fn draw_grid_svg(&self, special_characters: &SpecialCharacters) -> String {
+        crate::draw_grid::draw::<GRID_SIZE, Self::Layout>(self, special_characters)
     }
 
     fn draw_paper_svg(
@@ -550,17 +540,15 @@ mod tests {
     }
 
     #[test]
-    pub fn test_draw_grid(){
-         let level1 = crate::designed_level::DesignedLevel::<16, Square16Layout>::from_tsv_line(
+    pub fn test_draw_grid() {
+        let level1 = crate::designed_level::DesignedLevel::<16, Square16Layout>::from_tsv_line(
             // spellchecker:disable-next-line
             "CHSTWELADABFRROS\tFurniture\tchest\tshelf\tsofa\ttable\twardrobe",
             true,
         )
         .unwrap();
 
-        let svg = level1.draw_grid_svg(            
-            &crate::special_characters::SpecialCharacters::NONE,
-        );
+        let svg = level1.draw_grid_svg(&crate::special_characters::SpecialCharacters::NONE);
 
         let svg = svg.replace(
             r#"xmlns="http://www.w3.org/2000/svg""#,
@@ -583,9 +571,9 @@ mod tests {
             }
         }
     }
-    
+
     #[test]
-    pub fn test_draw_grid_hexagon(){
+    pub fn test_draw_grid_hexagon() {
         let level1 = crate::designed_level::DesignedLevel::<19, Hexagon19ThinLayout>::from_tsv_line(
             // spellchecker:disable-next-line
             r#"CREHAUSORLADIOMESTR		aroma[You might pick it up at a coffee shop]	choir[Ones who agree with you metaphorically]	Christmas[A famous father]	Carol[Number by a door]	crusade[Campaign religiously]	Treasure[Something found at "X"]	measure[Piano Bar]	medal[Come third or better]	salome[Dancer Of The Seven Veils]	tremor[It's a fault's fault]"#,
@@ -593,9 +581,7 @@ mod tests {
         )
         .unwrap();
 
-        let svg = level1.draw_grid_svg(            
-            &crate::special_characters::SpecialCharacters::NONE,
-        );
+        let svg = level1.draw_grid_svg(&crate::special_characters::SpecialCharacters::NONE);
 
         let svg = svg.replace(
             r#"xmlns="http://www.w3.org/2000/svg""#,
@@ -618,7 +604,6 @@ mod tests {
             }
         }
     }
-
 
     #[test]
     pub fn test_paper_svg() {
@@ -760,7 +745,6 @@ mod tests {
         .unwrap();
 
         let score = level1.difficulty_score();
-
 
         assert_eq!(score, 0.9383838)
     }

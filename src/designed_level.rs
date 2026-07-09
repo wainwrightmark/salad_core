@@ -164,8 +164,14 @@ impl<const GRID_SIZE: usize, Layout: GridLayout<GRID_SIZE>> DesignedLevel<GRID_S
             .next()
             .ok_or_else(|| format!("Level '{line}' should have a name"))?;
 
-        let (special_characters, grid_chars) =
-            SpecialCharacters::extract_from_grid_characters(grid_chars);
+        let (special_characters, grid_chars) = 
+        match
+            SpecialCharacters::try_extract_from_grid_characters(grid_chars){
+                Ok(a) => a,
+                Err(err) => {
+                    return Err(err.to_string());
+                },
+            };
 
         let grid = try_make_grid(grid_chars)
             .ok_or_else(|| format!("Level '{line}' should be able to make grid"))?;

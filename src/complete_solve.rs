@@ -1,4 +1,4 @@
-use crate::{prelude::*, special_characters::SpecialCharactersNormalized};
+use crate::prelude::*;
 use const_sized_bit_set::prelude::BitSet;
 use finite_state_transducer::{FST, LetterJoiner, State, index::FSTIndex};
 
@@ -16,7 +16,7 @@ impl FSTHelper {
         new_tile: GridTile,
         used_tiles: &GridSet,
         previous_chars: &CharsArray<GRID_SIZE>,
-        special_characters: &SpecialCharactersNormalized,
+        special_characters: &SpecialCharacters,
     ) {
         let character = grid[new_tile];
 
@@ -109,7 +109,7 @@ impl FSTHelper {
     ) -> Vec<RawWord<GRID_SIZE>> {
         let mut result: Vec<RawWord<GRID_SIZE>> = vec![];
         let empty_used_tiles = GridSet::EMPTY;
-        let special_characters_normalized = SpecialCharactersNormalized::new(special_characters);
+        
 
         //println!("Special characters normalized: {special_characters_normalized:?}");
 
@@ -118,7 +118,7 @@ impl FSTHelper {
                 grid,
                 wa,
                 &mut |mut raw_word| {
-                    special_characters_normalized
+                    special_characters
                         .reverse_convert_characters(&mut raw_word.characters);
                     result.push(raw_word)
                 },
@@ -126,7 +126,7 @@ impl FSTHelper {
                 tile,
                 &empty_used_tiles,
                 &CharsArray::new_const(),
-                &special_characters_normalized,
+                &special_characters,
             )
         }
 
@@ -143,7 +143,7 @@ impl FSTHelper {
     ) -> usize {
         let mut results: hashbrown::HashSet<RawWord<GRID_SIZE>> = Default::default();
         let empty_used_tiles = GridSet::EMPTY;
-        let special_characters_normalized = SpecialCharactersNormalized::new(special_characters);
+        
         for tile in LAYOUT::iter_tiles() {
             Self::find_words_inner::<GRID_SIZE, LAYOUT>(
                 grid,
@@ -155,7 +155,7 @@ impl FSTHelper {
                 tile,
                 &empty_used_tiles,
                 &CharsArray::new_const(),
-                &special_characters_normalized,
+                &special_characters,
             )
         }
 
@@ -366,7 +366,7 @@ mod tests {
 
     #[test]
     pub fn test_special_characters() {
-        let special_characters = SpecialCharacters::from_iter(["ant"]);
+        let special_characters = SpecialCharacters::try_from_iter(["ant"]).unwrap();
         let mut wa = MutableFST::default();
 
         for word in ["anteater", "elephant", "peat", "pant", "teat"] {

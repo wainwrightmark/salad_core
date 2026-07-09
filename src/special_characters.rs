@@ -1,13 +1,69 @@
 use arrayvec::ArrayVec;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
-use ustr::Ustr;
+use std::{
+    fmt::{Display, Write},
+    sync::Arc,
+};
 
-use crate::{character::normalize_characters_array, prelude::Character};
+use crate::prelude::{Character, normalize_characters_array};
+
+pub const SPECIAL_CHARACTER_ICON_DELIMITER: char = ':';
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SpecialCharacter {
+    pub text: String,
+    pub chars: ArrayVec<Character, 15>,
+    pub icon_key: Option<String>,
+}
+
+impl Display for SpecialCharacter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(icon_key) = &self.icon_key {
+            write!(
+                f,
+                "{}{SPECIAL_CHARACTER_ICON_DELIMITER}{}",
+                self.text, icon_key
+            )?;
+        } else {
+            f.write_str(self.text.as_str())?;
+        }
+
+        Ok(())
+    }
+}
+
+impl SpecialCharacter {
+    pub fn try_parse(text: &str) -> Result<Self, &'static str> {
+        let sc = if let Some((left, right)) = text.split_once(SPECIAL_CHARACTER_ICON_DELIMITER) {
+            SpecialCharacter {
+                chars: normalize_characters_array(left, &SpecialCharacters::NONE)?,
+                text: left.to_string(),
+                icon_key: Some(right.to_string()),
+            }
+        } else {
+            SpecialCharacter {
+                chars: normalize_characters_array(text, &SpecialCharacters::NONE)?,
+                text: text.to_string(),
+                icon_key: None,
+            }
+        };
+
+        Ok(sc)
+    }
+
+    pub fn try_new(text: &str, icon_key: Option<String>) -> Result<Self, &'static str> {
+        let chars = normalize_characters_array(text, &SpecialCharacters::NONE)?;
+        let text = text.to_string();
+        Ok(Self {
+            text,
+            icon_key,
+            chars,
+        })
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 
-pub struct SpecialCharacters(pub ArrayVec<Ustr, 21>);
+pub struct SpecialCharacters(pub ArrayVec<Arc<SpecialCharacter>, 21>);
 
 impl SpecialCharacters {
     pub const NONE: SpecialCharacters = SpecialCharacters(ArrayVec::new_const());
@@ -17,20 +73,32 @@ impl SpecialCharacters {
     }
 }
 
-impl<'s> FromIterator<&'s str> for SpecialCharacters {
-    fn from_iter<T: IntoIterator<Item = &'s str>>(iter: T) -> Self {
-        let mut sc = SpecialCharacters::NONE;
-        for x in iter {
-            let u = Ustr::from_str(x).unwrap();
-            sc.try_push(u).unwrap();
-        }
-        sc
-    }
-}
+// impl<'s> FromIterator<&'s str> for SpecialCharacters {
+//     fn from_iter<T: IntoIterator<Item = &'s str>>(iter: T) -> Self {
+//         let mut sc = SpecialCharacters::NONE;
+//         for x in iter {
+
+//             sc.try_push(x).unwrap();
+//         }
+//         sc
+//     }
+// }
 
 impl SpecialCharacters {
-    pub fn try_push(&mut self, sc: Ustr) -> Result<(), &'static str> {
-        match self.0.try_push(sc) {
+    pub fn try_from_iter<'a>(
+        iter: impl IntoIterator<Item = &'a str>,
+    ) -> Result<Self, &'static str> {
+        let mut special_characters = SpecialCharacters::NONE;
+        for x in iter {
+            let sc = SpecialCharacter::try_parse(x)?;
+            special_characters.try_push(sc)?;
+        }
+
+        Ok(special_characters)
+    }
+
+    pub fn try_push(&mut self, special_character: SpecialCharacter) -> Result<(), &'static str> {
+        match self.0.try_push(Arc::new(special_character)) {
             Ok(()) => Ok(()),
             Err(_) => Err("Too many special characters"),
         }
@@ -40,13 +108,13 @@ impl SpecialCharacters {
         self.0.len()
     }
 
-    pub fn get_from_special_index(&self, index: usize) -> Option<Ustr> {
-        self.0.get(index).copied()
+    pub fn get_from_special_index(&self, index: usize) -> Option<&SpecialCharacter> {
+        self.0.get(index).map(|x| x.as_ref())
     }
 
-    pub fn get_from_character(&self, character: Character) -> Option<Ustr> {
+    pub fn get_from_character(&self, character: Character) -> Option<&SpecialCharacter> {
         let special_index = character.special_index()?;
-        self.0.get(special_index).copied()
+        self.get_from_special_index(special_index)
     }
 
     //does this start with the numbers 0 to 9
@@ -57,62 +125,34 @@ impl SpecialCharacters {
         for index in 0..10 {
             let replacement = self.0.get(index).unwrap();
 
-            if replacement.parse() != Ok(index) {
+            if replacement.text.parse() != Ok(index) {
                 return false;
             }
         }
         true
     }
 
-    pub fn extract_from_grid_characters(gc: &str) -> (Self, &str) {
+    pub fn try_extract_from_grid_characters(gc: &str) -> Result<(Self, &str), &'static str> {
         if gc.ends_with('}')
             && let Some((prefix, suffix)) = gc.trim_end_matches('}').rsplit_once('{')
         {
             let mut specials = Self::NONE;
             for word in suffix.split(' ') {
-                let _ = specials.try_push(Ustr::from(word));
+                let sc = SpecialCharacter::try_parse(word)?;
+                specials.try_push(sc)?;
             }
-            return (specials, prefix);
+            return Ok((specials, prefix));
         }
-        (Self::NONE, gc)
-    }
-
-    pub fn format_for_url(&self) -> String {
-        let mut s = String::new();
-        s.push('{');
-        let mut first = true;
-        for word in self.0.iter() {
-            if first {
-                first = false;
-            } else {
-                s.push(' ');
-            }
-            s.push_str(word.as_str());
-        }
-
-        s.push('}');
-        s
+        Ok((Self::NONE, gc))
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct SpecialCharactersNormalized(pub Vec<Option<ArrayVec<Character, 15>>>);
-
-impl SpecialCharactersNormalized {
-    pub fn new(sc: &SpecialCharacters) -> Self {
-        let mut v = vec![];
-        for regular_text in sc.0.iter() {
-            v.push(normalize_characters_array(regular_text, &SpecialCharacters::NONE).ok());
-        }
-
-        Self(v)
-    }
-
+impl SpecialCharacters {
     pub fn try_get_replacement_chars_slice(&self, character: Character) -> Option<&[Character]> {
         match character.special_index() {
             Some(si) => match self.0.get(si) {
-                Some(Some(av)) => Some(av.as_slice()),
-                Some(None) | None => None,
+                Some(sc) => Some(sc.chars.as_slice()),
+                None => None,
             },
             None => None,
         }
@@ -129,25 +169,23 @@ impl SpecialCharactersNormalized {
         while index < chars.len() {
             //let current = chars[index];
             'replacements: for (sc_index, replacement) in self.0.iter().enumerate() {
-                if let Some(replacement) = replacement {
-                    if replacement.len() + index > chars.len() {
+                if replacement.chars.len() + index > chars.len() {
+                    continue 'replacements;
+                }
+                let mut len = 1usize;
+                while len <= replacement.chars.len() {
+                    if !replacement.chars.starts_with(&chars[index..(index + len)]) {
                         continue 'replacements;
                     }
-                    let mut len = 1usize;
-                    while len <= replacement.len() {
-                        if !replacement.starts_with(&chars[index..(index + len)]) {
-                            continue 'replacements;
-                        }
-                        len += 1;
-                    }
-                    chars[index] = Character::try_from_special_index(sc_index).unwrap();
-
-                    for _ in 2..len {
-                        chars.remove(index + 1);
-                    }
-
-                    break 'replacements;
+                    len += 1;
                 }
+                chars[index] = Character::try_from_special_index(sc_index).unwrap();
+
+                for _ in 2..len {
+                    chars.remove(index + 1);
+                }
+
+                break 'replacements;
             }
 
             index += 1;
@@ -179,6 +217,25 @@ impl SpecialCharactersNormalized {
     }
 }
 
+impl Display for SpecialCharacters {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_char('{')?;
+
+        let mut first = true;
+        for word in self.0.iter() {
+            if first {
+                first = false;
+            } else {
+                f.write_char(' ')?;
+            }
+            word.fmt(f)?;
+        }
+
+        f.write_char('}')?;
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use itertools::Itertools;
@@ -186,7 +243,6 @@ mod tests {
     use crate::{
         character::normalize_characters_array,
         prelude::{NormalizedCharacterIterator, SpecialCharacters},
-        special_characters::SpecialCharactersNormalized,
     };
     use test_case::test_case;
 
@@ -198,7 +254,7 @@ mod tests {
     #[test_case("HAND", "chandelier", "C0ELIER")]
     #[test_case("hand", "SHANDY", "S0Y")]
     fn test_normalized_character_iterator(special: &str, input: &str, expected: &str) {
-        let special_characters = SpecialCharacters::from_iter([special]);
+        let special_characters = SpecialCharacters::try_from_iter([special]).unwrap();
 
         let chars: Vec<_> = NormalizedCharacterIterator::new(input, &special_characters)
             .map(|x| x.inner_char().unwrap())
@@ -209,9 +265,7 @@ mod tests {
 
     #[test]
     fn test_forward_convert_character() {
-        let special_characters = SpecialCharacters::from_iter(["ant", "any"]);
-
-        let nsc = SpecialCharactersNormalized::new(&special_characters);
+        let special_characters = SpecialCharacters::try_from_iter(["ant", "any"]).unwrap();
 
         let mut anteater: arrayvec::ArrayVec<crate::prelude::Character, 16> =
             normalize_characters_array("anteater", &SpecialCharacters::NONE).unwrap();
@@ -220,9 +274,9 @@ mod tests {
         let mut spiral: arrayvec::ArrayVec<crate::prelude::Character, 16> =
             normalize_characters_array("spiral", &SpecialCharacters::NONE).unwrap();
 
-        nsc.forward_convert_characters(&mut spiral);
-        nsc.forward_convert_characters(&mut anteater);
-        nsc.forward_convert_characters(&mut elephant);
+        special_characters.forward_convert_characters(&mut spiral);
+        special_characters.forward_convert_characters(&mut anteater);
+        special_characters.forward_convert_characters(&mut elephant);
 
         assert_eq!(
             spiral.into_iter().map(|x| x.as_char_lower()).join(""),
@@ -240,14 +294,13 @@ mod tests {
 
     #[test]
     fn test_forward_convert_character2() {
-        let special_characters = SpecialCharacters::from_iter(["north", "east", "south", "west"]);
-
-        let nsc = SpecialCharactersNormalized::new(&special_characters);
+        let special_characters =
+            SpecialCharacters::try_from_iter(["north", "east", "south", "west"]).unwrap();
 
         let mut awestricken: arrayvec::ArrayVec<crate::prelude::Character, 16> =
             normalize_characters_array("awestricken", &SpecialCharacters::NONE).unwrap();
 
-        nsc.forward_convert_characters(&mut awestricken);
+        special_characters.forward_convert_characters(&mut awestricken);
 
         assert_eq!(
             awestricken.into_iter().map(|x| x.as_char_lower()).join(""),
@@ -257,9 +310,7 @@ mod tests {
 
     #[test]
     fn test_reverse_convert_character() {
-        let special_characters = SpecialCharacters::from_iter(["ant", "any"]);
-
-        let nsc = SpecialCharactersNormalized::new(&special_characters);
+        let special_characters = SpecialCharacters::try_from_iter(["ant", "any"]).unwrap();
 
         let mut anteater: arrayvec::ArrayVec<crate::prelude::Character, 16> =
             normalize_characters_array("anteater", &special_characters).unwrap();
@@ -268,9 +319,9 @@ mod tests {
         let mut spiral: arrayvec::ArrayVec<crate::prelude::Character, 16> =
             normalize_characters_array("spiral", &special_characters).unwrap();
 
-        nsc.reverse_convert_characters(&mut spiral);
-        nsc.reverse_convert_characters(&mut anteater);
-        nsc.reverse_convert_characters(&mut elephant);
+        special_characters.reverse_convert_characters(&mut spiral);
+        special_characters.reverse_convert_characters(&mut anteater);
+        special_characters.reverse_convert_characters(&mut elephant);
 
         assert_eq!(
             spiral.into_iter().map(|x| x.as_char_lower()).join(""),
