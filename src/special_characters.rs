@@ -137,7 +137,7 @@ impl SpecialCharacters {
             && let Some((prefix, suffix)) = gc.trim_end_matches('}').rsplit_once('{')
         {
             let mut specials = Self::NONE;
-            for word in suffix.split(' ') {
+            for word in suffix.split(' ').filter(|x| !x.is_empty()) {
                 let sc = SpecialCharacter::try_parse(word)?;
                 specials.try_push(sc)?;
             }
@@ -219,19 +219,22 @@ impl SpecialCharacters {
 
 impl Display for SpecialCharacters {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_char('{')?;
+        if !self.is_empty() {
+            f.write_char('{')?;
 
-        let mut first = true;
-        for word in self.0.iter() {
-            if first {
-                first = false;
-            } else {
-                f.write_char(' ')?;
+            let mut first = true;
+            for word in self.0.iter() {
+                if first {
+                    first = false;
+                } else {
+                    f.write_char(' ')?;
+                }
+                word.fmt(f)?;
             }
-            word.fmt(f)?;
+
+            f.write_char('}')?;
         }
 
-        f.write_char('}')?;
         Ok(())
     }
 }
