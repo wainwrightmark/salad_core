@@ -271,7 +271,7 @@ impl GridLayout<19> for Hexagon19FatLayout {
 
     const TILE_SHAPE: TileShape = TileShape::HexagonPointyTop;
 
-    const GAME_URL: &'static str = "https://hexagon-salad.netlify.app";
+    const GAME_URL: &'static str = "https://firsts.online";
 
     fn move_tile_direction(tile: GridTile, direction: ArrowDirection)-> Option<GridTile> {
         match direction{
@@ -569,7 +569,7 @@ impl GridLayout<19> for Hexagon19ThinLayout {
 
     const TILE_SHAPE: TileShape = TileShape::HexagonFlatTop;
 
-    const GAME_URL: &'static str = "https://hexagon-salad.netlify.app";
+    const GAME_URL: &'static str = "https://firsts.online";
 
 
     fn move_tile_direction(tile: GridTile, direction: ArrowDirection)-> Option<GridTile> {

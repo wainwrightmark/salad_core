@@ -66,6 +66,7 @@ impl<const GRID_SIZE: usize, Layout: GridLayout<GRID_SIZE>> DesignedLevel<GRID_S
     pub fn try_from_path(mut path: &str, sort_words: bool) -> Option<Self> {
         path = path.trim_start_matches("https://wordsalad.online");
         path = path.trim_start_matches("https://hexagon-salad.netlify.app");
+        path = path.trim_start_matches("https://firsts.online.netlify.app");
 
         if path.is_empty() || path.eq_ignore_ascii_case("/") {
             return None;
