@@ -27,21 +27,47 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
 
     ///human readable data string
     fn data_string(&self, title: &str, special_characters: &SpecialCharacters) -> String {
-        let grid = self.grid().iter().join("");
+        // format!("{grid}{special_characters}\t{title}{extra}{colors}\t{words}")
+        use std::fmt::Write;
+        let mut s = String::new();
+        for character in self.grid().iter() {
+            write!(&mut s, "{}", character.as_char()).unwrap();
+        }
 
-        let words = self.words().iter().map(|x| x.text()).join("\t");
+        write!(&mut s, "{special_characters}\t{title}").unwrap();
 
-        let extra = match self.extra_info() {
-            Some(e) => format!("[{e}]"),
-            None => "".to_string(),
-        };
+        if let Some(extra) = self.extra_info() {
+            s.push('[');
+            write!(&mut s, "{extra}").unwrap();
+            s.push(']');
+        }
 
-        let colors = match &self.special_colors() {
-            Some(c) => format!("{{{}}}", c.iter().map(|x| x.to_hex()).join(",")),
-            None => "".to_string(),
-        };
+        if let Some(colors) = self.special_colors() {
+            s.push('{');
+            for (index, color) in colors.iter().enumerate() {
+                if index > 0 {
+                    s.push(',');
+                }
+                s.push_str(color.to_hex().as_str());
+            }
+            s.push('}');
+        }
+        s.push('\t');
 
-        format!("{grid}{special_characters}\t{title}{extra}{colors}\t{words}")
+        for (index, word) in self.words().iter().enumerate() {
+            if index > 0 {
+                s.push('\t');
+            }
+            s.push_str(&word.text());
+
+            if let Some(clue) = word.quiz_question() {
+                s.push('[');
+                s.push_str(clue.as_str());
+                s.push(']');
+            }
+        }
+
+        return s;
     }
 
     fn url_string(&self, title: &str, special_characters: &SpecialCharacters) -> String {
@@ -747,5 +773,20 @@ mod tests {
         let score = level1.difficulty_score();
 
         assert_eq!(score, 0.9383838)
+    }
+
+    #[test]
+    pub fn test_tsv() {
+        let tsv_initial = r#"CREHAUSORLADIOMESTR	My Puzzle[by mark]{#A8436B,#D97882,#EEA5AB}	aroma[You might pick it up at a coffee shop]	choir[Ones who agree with you metaphorically]	Christmas[A famous father]	Carol[Number by a door]	crusade[Campaign religiously]	Treasure[Something found at "X"]	measure[Piano Bar]	medal[Come third or better]	salome[Dancer Of The Seven Veils]	tremor[It's a fault's fault]"#;
+
+        let level = crate::designed_level::DesignedLevel::<19, Hexagon19FatLayout>::from_tsv_line(
+            tsv_initial,
+            false,
+        )
+        .unwrap();
+
+        let actual_tsv = level.data_string(&level.name, &level.special_characters);
+
+        assert_eq!(tsv_initial, actual_tsv);
     }
 }
