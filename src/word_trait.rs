@@ -269,7 +269,7 @@ pub trait WordWithCounts: BasicWordTrait {
 pub trait WordTrait<const GRID_SIZE: usize>: BasicWordTrait {
     fn characters(&self) -> &ArrayVec<Character, GRID_SIZE>;
 
-    fn quiz_question(&self) -> Option<Ustr>;
+    fn clue(&self) -> Option<Ustr>;
 
     /// Return the letter counts of this word.
     /// Some implementations will store a cached value, others will recalculate it each time

@@ -52,7 +52,7 @@ impl<const GRID_SIZE: usize> WordTrait<GRID_SIZE> for DisplayWord<GRID_SIZE> {
         &self.characters
     }
 
-    fn quiz_question(&self) -> Option<Ustr> {
+    fn clue(&self) -> Option<Ustr> {
         self.question_text
     }
 }

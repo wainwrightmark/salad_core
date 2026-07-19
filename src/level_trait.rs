@@ -1,7 +1,5 @@
 use bit_bag::prelude::BitBag;
 use const_sized_bit_set::prelude::*;
-
-use itertools::Itertools;
 use ustr::Ustr;
 
 use super::word_trait::WordTrait;
@@ -26,7 +24,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
     fn special_colors(&self) -> Option<&[bevy_color::prelude::Srgba]>;
 
     ///human readable data string
-    fn data_string(&self, title: &str, special_characters: &SpecialCharacters) -> String {
+    fn tsv_line(&self, title: &str, special_characters: &SpecialCharacters) -> String {
         // format!("{grid}{special_characters}\t{title}{extra}{colors}\t{words}")
         use std::fmt::Write;
         let mut s = String::new();
@@ -60,7 +58,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
             }
             s.push_str(&word.text());
 
-            if let Some(clue) = word.quiz_question() {
+            if let Some(clue) = word.clue() {
                 s.push('[');
                 s.push_str(clue.as_str());
                 s.push(']');
@@ -70,8 +68,9 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         return s;
     }
 
+    ///Full Url String
     fn url_string(&self, title: &str, special_characters: &SpecialCharacters) -> String {
-        let unencoded = self.data_string(title, special_characters);
+        let unencoded = self.tsv_line(title, special_characters);
 
         use base64::Engine;
         let encoded = base64::engine::general_purpose::URL_SAFE.encode(unencoded);
@@ -495,16 +494,16 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         unneeded_tiles
     }
 
-    fn first_quiz_question_index(&self) -> Option<usize> {
+    fn first_clue_index(&self) -> Option<usize> {
         self.words()
             .iter()
             .enumerate()
-            .filter(|(_, word)| word.quiz_question().is_some())
+            .filter(|(_, word)| word.clue().is_some())
             .map(|x| x.0)
             .next()
     }
 
-    fn next_quiz_question_index(
+    fn next_clue_index(
         &self,
         current_index: usize,
         is_word_found: impl Fn(usize) -> bool,
@@ -785,7 +784,7 @@ mod tests {
         )
         .unwrap();
 
-        let actual_tsv = level.data_string(&level.name, &level.special_characters);
+        let actual_tsv = level.tsv_line(&level.name, &level.special_characters);
 
         assert_eq!(tsv_initial, actual_tsv);
     }
