@@ -12,19 +12,66 @@ pub const SPECIAL_CHARACTER_ICON_DELIMITER: char = ':';
 pub struct SpecialCharacter {
     pub text: String,
     pub chars: ArrayVec<Character, 15>,
-    pub icon_key: Option<String>,
+    pub appearance: SpecialCharacterAppearance,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum SpecialCharacterAppearance {
+    /// Just use text
+    None,
+    Icon {
+        key: String,
+        rotate_degrees: u32,
+        flip: bool,
+    },
+    Text {
+        text: String,
+        rotate_degrees: u32,
+        flip: bool,
+    },
 }
 
 impl Display for SpecialCharacter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(icon_key) = &self.icon_key {
-            write!(
-                f,
-                "{}{SPECIAL_CHARACTER_ICON_DELIMITER}{}",
-                self.text, icon_key
-            )?;
-        } else {
-            f.write_str(self.text.as_str())?;
+        f.write_str(self.text.as_str())?;
+
+        match &self.appearance {
+            SpecialCharacterAppearance::None => {}
+            SpecialCharacterAppearance::Icon { key, .. } => {
+                write!(f, "{SPECIAL_CHARACTER_ICON_DELIMITER}{key}",)?;
+            }
+            SpecialCharacterAppearance::Text { text, .. } => {
+                write!(
+                    f,
+                    "{SPECIAL_CHARACTER_ICON_DELIMITER}{SPECIAL_CHARACTER_ICON_DELIMITER}{text}",
+                )?;
+            }
+        }
+
+        match self.appearance {
+            SpecialCharacterAppearance::None => {}
+            SpecialCharacterAppearance::Icon {
+                rotate_degrees,
+                flip,
+                ..
+            }
+            | SpecialCharacterAppearance::Text {
+                rotate_degrees,
+                flip,
+                ..
+            } => {
+                if rotate_degrees % 360 != 0 {
+                    write!(
+                        f,
+                        "{SPECIAL_CHARACTER_ICON_DELIMITER}r{}",
+                        rotate_degrees % 360
+                    )?;
+                }
+
+                if flip {
+                    write!(f, "{SPECIAL_CHARACTER_ICON_DELIMITER}f")?;
+                }
+            }
         }
 
         Ok(())
@@ -33,29 +80,83 @@ impl Display for SpecialCharacter {
 
 impl SpecialCharacter {
     pub fn try_parse(text: &str) -> Result<Self, &'static str> {
-        let sc = if let Some((left, right)) = text.split_once(SPECIAL_CHARACTER_ICON_DELIMITER) {
-            SpecialCharacter {
-                chars: normalize_characters_array(left, &SpecialCharacters::NONE)?,
-                text: left.to_string(),
-                icon_key: Some(right.to_string()),
+        let (text, appearance) = match text.split_once(SPECIAL_CHARACTER_ICON_DELIMITER) {
+            Some((text, appearance_data)) => {
+                let (appearance_text, is_icon, remainder) = match appearance_data
+                    .strip_prefix(':')
+                {
+                    Some(appearance_data) => {
+                        let (l, r) =
+                            match appearance_data.split_once(SPECIAL_CHARACTER_ICON_DELIMITER) {
+                                Some((l, r)) => (l, r),
+                                None => (appearance_data, ""),
+                            };
+                        (l.to_string(), false, r)
+                    }
+                    None => {
+                        let (l, r) =
+                            match appearance_data.split_once(SPECIAL_CHARACTER_ICON_DELIMITER) {
+                                Some((l, r)) => (l, r),
+                                None => (appearance_data, ""),
+                            };
+                        (l.to_string(), true, r)
+                    }
+                };
+                let mut flip = false;
+                let mut rotate_degrees = 0;
+
+                for segment in remainder.split_terminator(SPECIAL_CHARACTER_ICON_DELIMITER) {
+                    if segment == "f" {
+                        flip = true;
+                    } else if segment.starts_with("r") {
+                        match segment.trim_start_matches("r").parse::<u32>() {
+                            Ok(rd) => rotate_degrees = rd,
+                            Err(_err) => {
+                                log::warn!(
+                                    "Invalid SpecialCharacterAppearance segment '{segment}'"
+                                );
+                            }
+                        };
+                    } else {
+                        log::warn!("Invalid SpecialCharacterAppearance segment '{segment}'");
+                    }
+                }
+                let appearance = if is_icon {
+                    SpecialCharacterAppearance::Icon {
+                        key: appearance_text,
+                        rotate_degrees,
+                        flip,
+                    }
+                } else {
+                    SpecialCharacterAppearance::Text {
+                        text: appearance_text,
+                        rotate_degrees,
+                        flip,
+                    }
+                };
+                (text, appearance)
+
+                //(left, SpecialCharacterAppearance::None)
             }
-        } else {
-            SpecialCharacter {
-                chars: normalize_characters_array(text, &SpecialCharacters::NONE)?,
-                text: text.to_string(),
-                icon_key: None,
-            }
+            None => (text, SpecialCharacterAppearance::None),
         };
 
-        Ok(sc)
+        Ok(SpecialCharacter {
+            chars: normalize_characters_array(text, &SpecialCharacters::NONE)?,
+            text: text.to_string(),
+            appearance,
+        })
     }
 
-    pub fn try_new(text: &str, icon_key: Option<String>) -> Result<Self, &'static str> {
+    pub fn try_new(
+        text: &str,
+        appearance: SpecialCharacterAppearance,
+    ) -> Result<Self, &'static str> {
         let chars = normalize_characters_array(text, &SpecialCharacters::NONE)?;
         let text = text.to_string();
         Ok(Self {
             text,
-            icon_key,
+            appearance,
             chars,
         })
     }
@@ -244,8 +345,7 @@ mod tests {
     use itertools::Itertools;
 
     use crate::{
-        character::normalize_characters_array,
-        prelude::{NormalizedCharacterIterator, SpecialCharacters},
+        character::normalize_characters_array, prelude::{NormalizedCharacterIterator, SpecialCharacter, SpecialCharacters},
     };
     use test_case::test_case;
 
@@ -338,5 +438,16 @@ mod tests {
             elephant.into_iter().map(|x| x.as_char_lower()).join(""),
             "elephant"
         );
+    }
+
+
+    #[test_case("police:police-badge:r180:f")]
+    #[test_case("one::1:r180:f")]
+    pub fn test_special_character_parsing(sc_string: &str){
+        let sc = SpecialCharacter::try_parse(sc_string).unwrap();
+
+        let actual = sc.to_string();
+
+        assert_eq!(sc_string, actual)
     }
 }
