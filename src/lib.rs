@@ -17,6 +17,9 @@ pub mod svg_hexagon;
 pub mod tile_usages;
 pub mod word_trait;
 pub mod clue_text;
+pub mod icon_paths;
+pub mod tile_contents;
+
 pub use crate::prelude::*;
 
 pub mod prelude {
