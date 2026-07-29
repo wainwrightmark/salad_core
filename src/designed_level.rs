@@ -2,7 +2,6 @@ use std::marker::PhantomData;
 
 use crate::{grid_layout::GridLayout, level_trait::LevelTrait, prelude::*};
 use base64::DecodeError;
-use bevy_color::Srgba;
 use itertools::Itertools;
 use log::{error, info, warn};
 use ustr::Ustr;
@@ -17,7 +16,7 @@ pub struct DesignedLevel<const GRID_SIZE: usize, Layout: GridLayout<GRID_SIZE>> 
     pub extra_info: Option<Ustr>,
     pub grid: Grid<GRID_SIZE>,
     pub words: Vec<DisplayWord<GRID_SIZE>>,
-    pub special_colors: Option<Vec<Srgba>>,
+    pub special_colors: Option<Vec<Ustr>>,
     pub hide_title_when_playing: bool,
     pub phantom: PhantomData<Layout>,
 }
@@ -195,12 +194,15 @@ impl<const GRID_SIZE: usize, Layout: GridLayout<GRID_SIZE>> DesignedLevel<GRID_S
                 let (prefix, colors) = name.split_at(index);
                 name = prefix.trim_end();
                 let colors = &colors[1..(colors.len() - 1)];
-                let mut colors_vec = Vec::<Srgba>::default();
+                let mut colors_vec = Vec::<Ustr>::default();
 
                 for c in colors.split(',') {
-                    if let Ok(color) = Srgba::hex(c) {
-                        colors_vec.push(color);
-                    } else {
+                    
+
+                    if let Some(n) = c.strip_prefix("#") && u32::from_str_radix(n, 16).is_ok()
+                    {
+                        colors_vec.push(Ustr::from(c));
+                    } else{
                         warn!("Could not parse color '{c}'");
                     }
                 }
@@ -276,7 +278,7 @@ impl<const GRID_SIZE: usize, Layout: GridLayout<GRID_SIZE>> LevelTrait<GRID_SIZE
         self.extra_info
     }
 
-    fn special_colors(&self) -> Option<&[bevy_color::prelude::Srgba]> {
+    fn special_colors(&self) -> Option<&[Ustr]> {
         match &self.special_colors {
             Some(sc) => Some(sc.as_slice()),
             None => None,

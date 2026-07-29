@@ -3,7 +3,6 @@ use std::{
     str::FromStr,
 };
 
-use bevy_color::prelude::Srgba;
 use const_sized_bit_set::prelude::BitSet32;
 use serde::{Deserialize, Serialize};
 
@@ -292,7 +291,7 @@ pub struct ClueTextSVGArgs {
     pub height: f32,    
     pub font_size: f32,
     pub font_family: &'static str,
-    pub fill: Srgba,
+    pub fill: &'static str,
 }
 
 
@@ -321,7 +320,7 @@ impl ClueText {
         let mut svg = String::new();
         let center_x = x + (width * 0.5); //
 
-        let fill = fill.to_hex();
+        
 
         writeln!(
             &mut svg,
@@ -409,7 +408,7 @@ mod tests {
         let text = r#"Hello World \i italics \b bold \n \a answer \1 number"#;
         let clue = ClueText::from_str(text).unwrap();
 
-        let args = super::ClueTextSVGArgs { x: 0.0, y: 0.0, width: 200.0, height: 50.0, font_size: 12.0, font_family: "montserrat", fill: bevy_color::prelude::Srgba::BLACK };
+        let args = super::ClueTextSVGArgs { x: 0.0, y: 0.0, width: 200.0, height: 50.0, font_size: 12.0, font_family: "montserrat", fill: "#000000" };
 
         let svg = clue.write_svg_element(args);
 
