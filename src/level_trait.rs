@@ -21,7 +21,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
     ///Usually the attribution
     fn extra_info(&self) -> Option<Ustr>;
 
-    fn special_colors(&self) -> Option<&[Ustr]>;
+    fn special_colors(&self) -> Option<&[bevy_color::prelude::Srgba]>;
 
     ///human readable data string
     fn tsv_line(&self, title: &str, special_characters: &SpecialCharacters) -> String {
@@ -46,7 +46,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
                 if index > 0 {
                     s.push(',');
                 }
-                s.push_str(color.as_str());
+                s.push_str(color.to_hex().as_str());
             }
             s.push('}');
         }
