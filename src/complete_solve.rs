@@ -8,7 +8,11 @@ use std::{fmt::Write, iter::Copied};
 pub struct FSTHelper;
 
 impl FSTHelper {
-    fn find_words_inner<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
+    fn find_words_inner<
+        const GRID_SIZE: usize,
+        LAYOUT: GridLayout<GRID_SIZE>,
+        const BLANKS_ARE_WILDCARDS: bool,
+    >(
         grid: &Grid<GRID_SIZE>,
         wa: &impl FST<Character>,
         push_result: &mut impl FnMut(RawWord<GRID_SIZE>),
@@ -19,6 +23,40 @@ impl FSTHelper {
         special_characters: &SpecialCharacters,
     ) {
         let character = grid[new_tile];
+
+        if BLANKS_ARE_WILDCARDS && character.is_blank() {
+            let state = wa.get_state(current_index);
+            for (character, next_index) in state.iter_next_letters() {
+                let state = wa.get_state(next_index);
+                let mut next_chars = previous_chars.to_owned();
+                next_chars.push(character);
+
+                let next_used_tiles = used_tiles.with_inserted(new_tile.inner_u32());
+
+                let adjacent_tiles = LAYOUT::iter_adjacent_tiles(new_tile)
+                    .filter(|t| !used_tiles.contains_const(t.inner_u32()));
+
+                for tile in adjacent_tiles {
+                    Self::find_words_inner::<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>(
+                        grid,
+                        wa,
+                        push_result,
+                        next_index,
+                        tile,
+                        &next_used_tiles,
+                        &next_chars,
+                        special_characters,
+                    );
+                }
+                if state.can_terminate() {
+                    push_result(RawWord {
+                        characters: next_chars,
+                    });
+                }
+            }
+
+            return;
+        }
 
         let slice = match special_characters.try_get_replacement_chars_slice(character) {
             Some(slice) => slice,
@@ -39,7 +77,7 @@ impl FSTHelper {
                 .filter(|t| !used_tiles.contains_const(t.inner_u32()));
 
             for tile in adjacent_tiles {
-                Self::find_words_inner::<GRID_SIZE, LAYOUT>(
+                Self::find_words_inner::<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>(
                     grid,
                     wa,
                     push_result,
@@ -102,24 +140,22 @@ impl FSTHelper {
         }
     }
 
-    pub fn find_all_words<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
+    pub fn find_all_words<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>,const BLANKS_ARE_WILDCARDS: bool,>(
         grid: &Grid<GRID_SIZE>,
         wa: &impl FST<Character>,
         special_characters: &SpecialCharacters,
     ) -> Vec<RawWord<GRID_SIZE>> {
         let mut result: Vec<RawWord<GRID_SIZE>> = vec![];
         let empty_used_tiles = GridSet::EMPTY;
-        
 
         //println!("Special characters normalized: {special_characters_normalized:?}");
 
         for tile in LAYOUT::iter_tiles() {
-            Self::find_words_inner::<GRID_SIZE, LAYOUT>(
+            Self::find_words_inner::<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>(
                 grid,
                 wa,
                 &mut |mut raw_word| {
-                    special_characters
-                        .reverse_convert_characters(&mut raw_word.characters);
+                    special_characters.reverse_convert_characters(&mut raw_word.characters);
                     result.push(raw_word)
                 },
                 FSTIndex(0),
@@ -136,16 +172,16 @@ impl FSTHelper {
         result
     }
 
-    pub fn count_words<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
+    pub fn count_words<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool,>(
         grid: &Grid<GRID_SIZE>,
         wa: &impl FST<Character>,
         special_characters: &SpecialCharacters,
     ) -> usize {
         let mut results: hashbrown::HashSet<RawWord<GRID_SIZE>> = Default::default();
         let empty_used_tiles = GridSet::EMPTY;
-        
+
         for tile in LAYOUT::iter_tiles() {
-            Self::find_words_inner::<GRID_SIZE, LAYOUT>(
+            Self::find_words_inner::<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>(
                 grid,
                 wa,
                 &mut |x| {
@@ -351,7 +387,42 @@ mod tests {
         let grid = try_make_grid::<16>("VENMOUAULTRSHPEN").unwrap();
 
         let grid_words =
-            FSTHelper::find_all_words::<16, Square16Layout>(&grid, &wa, &SpecialCharacters::NONE);
+            FSTHelper::find_all_words::<16, Square16Layout, false>(&grid, &wa, &SpecialCharacters::NONE);
+
+        let found_words = grid_words
+            .iter()
+            .map(|x| x.characters.iter().map(|x| x.as_char_lower()).join(""))
+            .join(", ");
+
+        assert_eq!(
+            found_words,
+            "earth, mars, neptune, pluto, saturn, uranus, venus", //Should be in alphabetical order
+        )
+    }
+    
+    #[test]
+    pub fn test_on_grid_blanks_as_wildcards() {
+        let special_characters = SpecialCharacters::NONE;
+        let mut wa = MutableFST::default();
+
+        for word in [
+            "Earth", "Mars", "Neptune", "Pluto", "Saturn", "Uranus", "Venus", "Some", "Random",
+            "Word",
+        ] {
+            let word = RawWord::<16>::from_string(word, &special_characters).unwrap();
+            wa.add_word(&word);
+        }
+
+        //assert_eq!(wa.slab.len(), 52);
+        //println!("Uncompressed - {} states", wa.slab.len());
+        let wa = wa.compress();
+        //println!("Compressed - {} states", wa.slab.len());
+        //assert_eq!(wa.slab.len(), 38);
+
+        let grid = try_make_grid::<16>("VENMOUAULTRSHPE_").unwrap();
+
+        let grid_words =
+            FSTHelper::find_all_words::<16, Square16Layout, true>(&grid, &wa, &SpecialCharacters::NONE);
 
         let found_words = grid_words
             .iter()
@@ -383,7 +454,7 @@ mod tests {
         let grid = try_make_grid::<16>("0EATH__EP__RELE_").unwrap();
 
         let grid_words =
-            FSTHelper::find_all_words::<16, Square16Layout>(&grid, &wa, &special_characters);
+            FSTHelper::find_all_words::<16, Square16Layout, false>(&grid, &wa, &special_characters);
 
         let found_words = grid_words
             .iter()

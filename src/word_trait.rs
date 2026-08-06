@@ -7,7 +7,7 @@ use crate::grid_layout::GridLayout;
 use crate::prelude::*;
 use crate::{Character, Grid, GridSet, GridTile, Solution};
 
-pub struct WordSolutionIter<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>> {
+pub struct WordSolutionIter<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool> {
     characters: ArrayVec<Character, GRID_SIZE>,
     grid: Grid<GRID_SIZE>,
 
@@ -16,11 +16,11 @@ pub struct WordSolutionIter<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE
     phantom: PhantomData<LAYOUT>,
 }
 
-impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>> WordSolutionIter<GRID_SIZE, LAYOUT> {
+impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool> WordSolutionIter<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS> {
     pub fn new(characters: ArrayVec<Character, GRID_SIZE>, grid: Grid<GRID_SIZE>) -> Self {
         let next_first_tile: Option<GridTile> = if let Some(first_char) = characters.first() {
             grid.enumerate()
-                .filter(|x| x.1 == *first_char)
+                .filter(|x| x.1 == *first_char || (BLANKS_ARE_WILDCARDS && x.1.is_blank()))
                 .map(|x| x.0)
                 .next()
         } else {
@@ -46,8 +46,8 @@ struct WSIState<const GRID_SIZE: usize> {
     char_to_find: Character,
 }
 
-impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>> Iterator
-    for WordSolutionIter<GRID_SIZE, LAYOUT>
+impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool> Iterator
+    for WordSolutionIter<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>
 {
     type Item = Solution<GRID_SIZE>;
 
@@ -62,7 +62,7 @@ impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>> Iterator
                 ) {
                     state.current_index += 1;
 
-                    if self.grid[adjacent_tile] == state.char_to_find
+                    if (self.grid[adjacent_tile] == state.char_to_find || (BLANKS_ARE_WILDCARDS && self.grid[adjacent_tile].is_blank()))
                         && !state.used_tiles.contains_const(adjacent_tile.0 as u32)
                     {
                         //we need to go deeper
@@ -282,14 +282,21 @@ pub trait WordTrait<const GRID_SIZE: usize>: BasicWordTrait {
         &self,
         grid: Grid<GRID_SIZE>,
     ) -> impl Iterator<Item = Solution<GRID_SIZE>> {
-        WordSolutionIter::<GRID_SIZE, LAYOUT>::new(self.characters().clone(), grid)
+        WordSolutionIter::<GRID_SIZE, LAYOUT, false>::new(self.characters().clone(), grid)
     }
 
     fn find_solution<LAYOUT: GridLayout<GRID_SIZE>>(
         &self,
         grid: Grid<GRID_SIZE>,
     ) -> Option<Solution<GRID_SIZE>> {
-        WordSolutionIter::<GRID_SIZE, LAYOUT>::new(self.characters().clone(), grid).next()
+        WordSolutionIter::<GRID_SIZE, LAYOUT, false>::new(self.characters().clone(), grid).next()
+    }
+    
+    fn find_solution_blanks_as_wildcards<LAYOUT: GridLayout<GRID_SIZE>>(
+        &self,
+        grid: Grid<GRID_SIZE>,
+    ) -> impl Iterator<Item = Solution<GRID_SIZE>> {
+        WordSolutionIter::<GRID_SIZE, LAYOUT, true>::new(self.characters().clone(), grid)
     }
 
     fn find_solutions_with_tiles<LAYOUT: GridLayout<GRID_SIZE>>(
@@ -386,10 +393,10 @@ mod tests {
     }
 
     #[test]
-    pub fn test_find_solutions() {
+    pub fn test_find_solutions_allow_blanks() {
         let level = DesignedLevel::<16, Square16Layout>::from_tsv_line(
             //spellchecker:disable-next-line
-            "JNAMLUERNPTSEOIH	5	Earth	Jupiter	Mars	Neptune	Pluto",
+            "JNAMLUERNPTS____	5	Earth	Jupiter	Mars	Neptune	Pluto",
             true,
         )
         .expect("Could not parse line");
@@ -414,7 +421,7 @@ mod tests {
         let mut results: Vec<SolutionResult> = vec![];
 
         for (index, word) in level.words.iter().enumerate() {
-            let solutions = word.find_solutions::<Square16Layout>(grid).collect_vec();
+            let solutions = word.find_solution_blanks_as_wildcards::<Square16Layout>(grid).collect_vec();
 
             results.push(SolutionResult {
                 word: word.text.to_string(),
@@ -447,4 +454,7 @@ mod tests {
 
         insta::assert_debug_snapshot!(results);
     }
+
+
+    
 }
