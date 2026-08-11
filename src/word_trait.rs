@@ -51,7 +51,7 @@ impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WIL
 {
     type Item = Solution<GRID_SIZE>;
 
-    fn next(&mut self) -> Option<Self::Item> {
+    fn next(&mut self) -> Option<Self::Item> {        
         //TODO more efficient path if word has no duplicate letters
 
         loop {
@@ -111,12 +111,15 @@ impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WIL
             } else if let Some(first_tile) = self.next_first_tile {
                 self.next_first_tile = {
                     let mut current: GridTile = first_tile;
-                    let first_char = self.grid[first_tile];
+                    let Some(first_char)  = self.characters.get(0).cloned() else{
+                        return None; //word is empty;
+                    };
+                    //let first_char = self.grid[first_tile];
                     loop {
                         if let Some(n) = current.try_next::<GRID_SIZE>() {
                             current = n;
 
-                            if self.grid[current] == first_char {
+                            if self.grid[current] == first_char || (BLANKS_ARE_WILDCARDS && self.grid[current].is_blank()) {
                                 break Some(current);
                             }
                         } else {
@@ -292,7 +295,7 @@ pub trait WordTrait<const GRID_SIZE: usize>: BasicWordTrait {
         WordSolutionIter::<GRID_SIZE, LAYOUT, false>::new(self.characters().clone(), grid).next()
     }
     
-    fn find_solution_blanks_as_wildcards<LAYOUT: GridLayout<GRID_SIZE>>(
+    fn find_solutions_blanks_as_wildcards<LAYOUT: GridLayout<GRID_SIZE>>(
         &self,
         grid: Grid<GRID_SIZE>,
     ) -> impl Iterator<Item = Solution<GRID_SIZE>> {
@@ -421,7 +424,7 @@ mod tests {
         let mut results: Vec<SolutionResult> = vec![];
 
         for (index, word) in level.words.iter().enumerate() {
-            let solutions = word.find_solution_blanks_as_wildcards::<Square16Layout>(grid).collect_vec();
+            let solutions = word.find_solutions_blanks_as_wildcards::<Square16Layout>(grid).collect_vec();
 
             results.push(SolutionResult {
                 word: word.text.to_string(),
@@ -453,6 +456,22 @@ mod tests {
         }
 
         insta::assert_debug_snapshot!(results);
+    }
+
+    #[test]
+    pub fn test_find_solution_blanks_as_wildcards(){
+
+        let grid: Grid<19> = try_make_grid("P_ESITGATROLNEWNRMO").unwrap();
+
+        let word = DisplayWord::from_string("Strix", &SpecialCharacters::NONE).unwrap();
+
+        let Some(solution)  = word.find_solutions_blanks_as_wildcards::<Hexagon19ThinLayout>(grid).next()
+        else{
+            panic!("Could not find solution")
+        };
+        let letters = solution.iter().map(|x| grid[*x].as_char()).join("");
+
+        assert_eq!(letters, "STRI_");
     }
 
 
