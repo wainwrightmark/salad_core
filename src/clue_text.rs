@@ -293,6 +293,7 @@ pub struct ClueTextSVGArgs {
     pub font_size: f32,
     pub font_family: &'static str,
     pub fill: Srgba,
+    pub word_length_fill: Srgba,
 }
 
 
@@ -316,12 +317,14 @@ impl ClueText {
             font_size,
             font_family,
             fill,
+            word_length_fill
         } = args;
 
         let mut svg = String::new();
         let center_x = x + (width * 0.5); //
 
         let fill = fill.to_hex();
+        let word_length_fill = word_length_fill.to_hex();
 
         writeln!(
             &mut svg,
@@ -350,7 +353,7 @@ impl ClueText {
                         writeln!(&mut svg, r#"<tspan font-weight="800">{answer_number}</tspan>"#).unwrap();
                     },
                     ClueTextSegment::Text(text) => {
-                        let weight = if is_bold {700} else {500};
+                        let weight = if is_bold {700} else {600};
                         let font_style = if is_italic {"italic"} else{"normal"};
 
                         writeln!(&mut svg, r#"<tspan font-weight="{weight}" font-style="{font_style}">{text}</tspan>"#).unwrap();
@@ -362,7 +365,7 @@ impl ClueText {
                         }
                     },
                     ClueTextSegment::WordLength(wl)=>{
-                        writeln!(&mut svg, r#"<tspan font-weight="500" font-style="normal">{wl}</tspan>"#).unwrap();
+                        writeln!(&mut svg, r#"<tspan font-weight="600" font-style="normal" fill={word_length_fill}>{wl}</tspan>"#).unwrap();
                     }
                 }
             }
@@ -406,12 +409,15 @@ mod tests {
 
     #[test]
     fn test_clues_svg(){
-        let text = r#"Hello World \i italics \b bold \n \a answer \1 number"#;
-        let clue = ClueText::from_str(text).unwrap();
+        let text = r#"Hello World \i italics \b bold \n \a ans \1 number"#;
+        let mut clue = ClueText::from_str(text).unwrap();
+        clue.push_segment(super::ClueTextSegment::WordLength("(5,6)".to_string()));
 
-        let args = super::ClueTextSVGArgs { x: 0.0, y: 0.0, width: 200.0, height: 50.0, font_size: 12.0, font_family: "montserrat", fill: bevy_color::prelude::Srgba::BLACK };
+        let args = super::ClueTextSVGArgs { x: 0.0, y: 0.0, width: 200.0, height: 50.0, font_size: 12.0, font_family: "montserrat", fill: bevy_color::prelude::Srgba::BLACK, word_length_fill: bevy_color::prelude::Srgba::rgb_u8(127,127,127) };
 
         let svg = clue.write_svg_element(args);
+
+        
 
         let svg = format!(
             r#"<svg xmlns="http://www.w3.org/2000/svg"" style=" background:white" viewBox="0 0 200 50">
