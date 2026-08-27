@@ -141,7 +141,26 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
     }
 
     fn draw_grid_svg(&self, special_characters: &SpecialCharacters) -> String {
-        crate::draw_grid::draw::<GRID_SIZE, Self::Layout>(self, special_characters)
+        crate::draw_grid::draw::<GRID_SIZE, Self::Layout>(
+            self,
+            special_characters,
+            &Solution::new(),
+            &[],
+        )
+    }
+
+    fn draw_grid_svg_with_solution(
+        &self,
+        special_characters: &SpecialCharacters,
+        solution: &Solution<GRID_SIZE>,
+        word_line_colors: &[bevy_color::prelude::Srgba],
+    ) -> String {
+        crate::draw_grid::draw::<GRID_SIZE, Self::Layout>(
+            self,
+            special_characters,
+            solution,
+            word_line_colors,
+        )
     }
 
     fn draw_paper_svg(
@@ -614,6 +633,47 @@ mod tests {
         );
 
         let path = "furniture_grid_hexagon.svg";
+
+        match std::panic::catch_unwind(|| {
+            insta::assert_snapshot!(svg.clone());
+        }) {
+            Ok(()) => {
+                if !std::fs::exists("path").unwrap() {
+                    std::fs::write(path, svg.clone()).unwrap();
+                }
+            }
+            Err(_err) => {
+                std::fs::write(path, svg.clone()).unwrap();
+                insta::assert_snapshot!(svg);
+            }
+        }
+    }
+
+    #[test]
+    pub fn test_draw_grid_hexagon_with_line() {
+        let level1 = crate::designed_level::DesignedLevel::<19, Hexagon19ThinLayout>::from_tsv_line(
+            // spellchecker:disable-next-line
+            r#"CREHAUSORLADIOMESTR		aroma[You might pick it up at a coffee shop]	choir[Ones who agree with you metaphorically]	Christmas[A famous father]	Carol[Number by a door]	crusade[Campaign religiously]	Treasure[Something found at "X"]	measure[Piano Bar]	medal[Come third or better]	salome[Dancer Of The Seven Veils]	tremor[It's a fault's fault]"#,
+            true
+        )
+        .unwrap();
+
+        let svg = level1.draw_grid_svg_with_solution(
+            &crate::special_characters::SpecialCharacters::NONE,
+            &ArrayVec::from_iter([GridTile(0), GridTile(1), GridTile(2), GridTile(5)]),
+            &[
+                bevy_color::prelude::Srgba::GREEN,
+                bevy_color::prelude::Srgba::BLUE,
+                bevy_color::prelude::Srgba::RED,
+            ],
+        );
+
+        let svg = svg.replace(
+            r#"xmlns="http://www.w3.org/2000/svg""#,
+            r#"xmlns="http://www.w3.org/2000/svg" style="background:white""#,
+        );
+
+        let path = "furniture_grid_hexagon_with_line.svg";
 
         match std::panic::catch_unwind(|| {
             insta::assert_snapshot!(svg.clone());

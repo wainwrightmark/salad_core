@@ -2,11 +2,12 @@ pub mod character;
 pub mod complete_solve;
 pub mod designed_level;
 pub mod display_word;
-pub mod draw_paper;
 pub mod draw_grid;
+pub mod draw_paper;
 pub mod grid;
 pub mod grid_layout;
 pub mod grid_tile;
+pub mod icon_paths;
 pub mod letter_counts;
 pub mod level_trait;
 pub mod normalized_character_iterator;
@@ -14,11 +15,10 @@ pub mod possible_paths;
 pub mod safety_restriction;
 pub mod special_characters;
 pub mod svg_hexagon;
+pub mod tile_contents;
 pub mod tile_usages;
 pub mod word_trait;
-pub mod clue_text;
-pub mod icon_paths;
-pub mod tile_contents;
+pub mod line_segment;
 
 pub use crate::prelude::*;
 

@@ -22,6 +22,44 @@ expression: svg.clone()
 <polygon points="100.00,303.11 75.00,346.41 25.00,346.41 0.00,303.11 25.00,259.81 75.00,259.81 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
 <polygon points="175.00,346.41 150.00,389.71 100.00,389.71 75.00,346.41 100.00,303.11 150.00,303.11 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
 <polygon points="250.00,389.71 225.00,433.01 175.00,433.01 150.00,389.71 175.00,346.41 225.00,346.41 "  stroke="#221f21" stroke-width="2" fill="transparent" style="fill:none"> </polygon>
+<g>
+<line
+	x1="200"
+	y1="43.30127"
+	x2="275"
+	y2="86.60254"
+	opacity="1"
+	visibility="visible"
+	stroke=#00FF00
+	stroke-linecap="round"
+	stroke-width="65"
+	pointer-events="none" >
+	</line>
+<line
+	x1="275"
+	y1="86.60254"
+	x2="350"
+	y2="129.90381"
+	opacity="1"
+	visibility="visible"
+	stroke=#0000FF
+	stroke-linecap="round"
+	stroke-width="65"
+	pointer-events="none" >
+	</line>
+<line
+	x1="350"
+	y1="129.90381"
+	x2="275"
+	y2="173.20508"
+	opacity="1"
+	visibility="visible"
+	stroke=#FF0000
+	stroke-linecap="round"
+	stroke-width="65"
+	pointer-events="none" >
+	</line>
+</g>
 <text transform="translate(200,43.30127) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">C </text>
 <text transform="translate(275,86.60254) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">R </text>
 <text transform="translate(350,129.90381) " font-size="40" dominant-baseline="central" fill="#6b6e71" font-family="Montserrat" font-weight="bold" style="text-align: center; text-anchor: middle;">E </text>
