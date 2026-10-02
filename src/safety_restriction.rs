@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, Display, EnumIs, EnumString};
+use strum::{AsRefStr, Display, EnumIs, EnumIter, EnumString};
 
 use crate::prelude::{Grid, GridLayout, GridSet, WordTrait};
 
@@ -20,6 +20,7 @@ use crate::prelude::{Grid, GridLayout, GridSet, WordTrait};
     Display,
     EnumString,
     AsRefStr,
+    EnumIter
 )]
 pub enum SafetyRestriction {
     #[default]
