@@ -1,4 +1,5 @@
 use arrayvec::ArrayVec;
+use itertools::Itertools;
 use std::marker::PhantomData;
 use std::num::NonZeroUsize;
 use ustr::Ustr;
@@ -339,6 +340,27 @@ pub trait WordTrait<const GRID_SIZE: usize>: BasicWordTrait {
             }
         }
         true
+    }
+}
+
+impl<const GRID_SIZE: usize> BasicWordTrait for CharsArray<GRID_SIZE>
+{
+    fn text(&self) -> Ustr {
+        self.iter().join("").into()
+    }
+
+    fn characters_slice(&self) -> &[Character] {
+        self.as_slice()
+    }
+}
+
+impl<const GRID_SIZE: usize> WordTrait<GRID_SIZE> for CharsArray<GRID_SIZE>{
+    fn characters(&self) -> &ArrayVec<Character, GRID_SIZE> {
+        &self
+    }
+
+    fn clue(&self) -> Option<Ustr> {
+        None
     }
 }
 

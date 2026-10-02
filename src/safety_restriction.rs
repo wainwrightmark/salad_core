@@ -36,7 +36,7 @@ impl SafetyRestriction {
 
     pub fn check_is_safe<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
         self,
-        word: impl WordTrait<GRID_SIZE>,
+        word: &impl WordTrait<GRID_SIZE>,
         grid: Grid<GRID_SIZE>,
     ) -> bool {
         match self {
