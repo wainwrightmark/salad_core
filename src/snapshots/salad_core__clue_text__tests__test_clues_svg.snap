@@ -8,15 +8,13 @@ expression: svg
 <tspan font-weight="600" font-style="normal">Hello World </tspan>
 <tspan font-weight="600" font-style="italic"> italics </tspan>
 <tspan font-weight="700" font-style="italic"> bold </tspan>
+<tspan font-weight="800" fill=#0000FF>ANSWER</tspan>
+<tspan font-weight="800" fill=#0000FF>1</tspan>
+<tspan font-weight="800" fill=#0000FF>ANSWER</tspan>
 </tspan>
 <tspan x=100.0 y=33.3>
-<tspan font-weight="700" font-style="italic"> </tspan>
-<tspan font-weight="800">ANSWERS</tspan>
-<tspan font-weight="700" font-style="italic"> ans </tspan>
-<tspan font-weight="800">1</tspan>
-<tspan font-weight="700" font-style="italic"> number</tspan>
-<tspan font-weight="600" font-style="normal" fill=#7F7F7F>(5,6)</tspan>
+<tspan font-size=10 font-weight="400" font-style="normal" fill=#7F7F7F>(5,6)</tspan>
 </tspan>
 </text>
-            
+
 </svg>
