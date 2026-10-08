@@ -438,7 +438,7 @@ impl GridLayout<19> for Hexagon19FatLayout {
         const SYMMETRY_RESTRICTIONS: [SymmetryRestriction; 3] = [
             SymmetryRestriction::new(&[], &[0, 1, 4, 9]),
             SymmetryRestriction::new(&[9], &[0, 1, 4]),
-            SymmetryRestriction::new(&[0, 1, 4, 9], &[0, 1, 2, 4, 5, 6, 9, 10, 11, 14, 15, 18]),
+            SymmetryRestriction::new(&[0,  4, 9, 14, 18], &[0, 1, 2, 4, 5, 6, 9, 10, 11, 14, 15, 18]),
         ];
         SYMMETRY_RESTRICTIONS.into_iter()
     }
@@ -763,7 +763,7 @@ impl GridLayout<19> for Hexagon19ThinLayout {
         const SYMMETRY_RESTRICTIONS: [SymmetryRestriction; 3] = [
             SymmetryRestriction::new(&[], &[0, 1, 4, 9]),
             SymmetryRestriction::new(&[9], &[0, 1, 4]),
-            SymmetryRestriction::new(&[0, 1, 4, 9], &[0, 1, 2, 4, 5, 6, 9, 10, 11, 14, 15, 18]),
+            SymmetryRestriction::new(&[0, 4, 9, 14, 18], &[0, 1, 2, 4, 5, 6, 9, 10, 11, 14, 15, 18]),
         ];
         SYMMETRY_RESTRICTIONS.into_iter()
     }
