@@ -1,7 +1,9 @@
 use ustr::Ustr;
 
-use crate::{icon_paths::IconPaths, prelude::{Character, SpecialCharacterAppearance, SpecialCharacters}};
-
+use crate::{
+    icon_paths::IconPathData,
+    prelude::{Character, SpecialCharacterAppearance, SpecialCharacters},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TileContents {
@@ -10,8 +12,8 @@ pub enum TileContents {
         flip: bool,
         rotate_degrees: u32,
     },
-    Path {
-        d: Ustr,
+    Icon {
+        unicode_char: char,
         flip: bool,
         rotate_degrees: u32,
     },
@@ -21,7 +23,7 @@ impl TileContents {
     pub fn get_from_character(
         character: Character,
         special_characters: &SpecialCharacters,
-        icon_paths: &IconPaths,
+        icon_paths: &IconPathData,
     ) -> TileContents {
         let tile_contents: TileContents;
         if let Some(special_index) = character.special_index()
@@ -37,13 +39,13 @@ impl TileContents {
                     };
                 }
                 SpecialCharacterAppearance::Icon {
-                    key,
+                    key_lower,
                     rotate_degrees,
                     flip,
-                } => match icon_paths.map.get(key) {
-                    Some(d) => {
-                        tile_contents = TileContents::Path {
-                            d: Ustr::from(&d),
+                } => match icon_paths.get_icon_character(&key_lower) {
+                    Some(unicode_char) => {
+                        tile_contents = TileContents::Icon {
+                            unicode_char,
                             flip: *flip,
                             rotate_degrees: *rotate_degrees,
                         };
@@ -54,9 +56,7 @@ impl TileContents {
                             flip: false,
                             rotate_degrees: 0,
                         };
-                        if !icon_paths.map.is_empty() {
-                            log::warn!("Could not get icon '{key}'");
-                        }
+                        log::warn!("Could not get icon '{key_lower}' from {} icon paths", icon_paths.len());
                     }
                 },
                 SpecialCharacterAppearance::Text {

@@ -1,37 +1,48 @@
-use std::{collections::BTreeMap, sync::Arc};
-use ustr::Ustr;
+use std::sync::LazyLock;
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct IconRow {
-    pub name: String,
-    pub path: String,
+pub struct IconPathData(LazyLock<Vec<&'static str>>);
+
+impl IconPathData {
+    pub const fn new(lazy_lock: LazyLock<Vec<&'static str>>) -> Self {
+        Self(lazy_lock)
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn get_icon_character(&self, icon_name_lower: &str) -> Option<char> {
+        self.0
+            .binary_search(&icon_name_lower)
+            .ok()
+            .and_then(|index| {
+                let character_code = 0xe900u32 + (index as u32);
+                char::from_u32(character_code)
+            })
+    }
 }
 
-#[derive(Debug, PartialEq, Clone, Default)]
-pub struct IconPaths {
-    pub map: Arc<BTreeMap<String, Ustr>>,
-}
+#[cfg(test)]
+mod tests {
+    use std::sync::LazyLock;
+    use crate::icon_paths::IconPathData;
 
-impl IconPaths {
-    pub fn from_rows(data: &str) -> Result<Self, anyhow::Error> {
-        let mut icons = vec![];
-        for line in data.lines().map(|x| x.trim()).filter(|x| !x.is_empty()) {
-            match line.split_once('\t') {
-                Some((name, path)) => {
-                    icons.push(IconRow {
-                        name: name.to_string(),
-                        path: path.to_string(),
-                    });
-                }
-                None => anyhow::bail!("Could not split line '{line}'"),
-            }
-        }
+    const PATHS_DATA: &'static str = r#"suits
+summits
+sun
+sun-cloud
+sun-priest
+sun-radiations
+sun-spear
+sunbeams
+"#;
 
-        let map = icons
-            .into_iter()
-            .map(|x| (x.name, Ustr::from(x.path.as_str())))
-            .collect();
+    #[test]
+    pub fn test_get_icon() {
+        let ipd = IconPathData::new(LazyLock::new(|| PATHS_DATA.lines().collect()));
 
-        Ok(IconPaths { map: Arc::new(map) })
+        assert!(ipd.0.is_sorted());
+
+        assert_eq!(ipd.get_icon_character("sun"), char::from_u32(0xe902));
     }
 }

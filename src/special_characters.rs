@@ -20,7 +20,7 @@ pub enum SpecialCharacterAppearance {
     /// Just use text
     None,
     Icon {
-        key: String,
+        key_lower: String,
         rotate_degrees: u32,
         flip: bool,
     },
@@ -37,8 +37,8 @@ impl Display for SpecialCharacter {
 
         match &self.appearance {
             SpecialCharacterAppearance::None => {}
-            SpecialCharacterAppearance::Icon { key, .. } => {
-                write!(f, "{SPECIAL_CHARACTER_ICON_DELIMITER}{key}",)?;
+            SpecialCharacterAppearance::Icon { key_lower, .. } => {
+                write!(f, "{SPECIAL_CHARACTER_ICON_DELIMITER}{key_lower}",)?;
             }
             SpecialCharacterAppearance::Text { text, .. } => {
                 write!(
@@ -123,7 +123,7 @@ impl SpecialCharacter {
                 }
                 let appearance = if is_icon {
                     SpecialCharacterAppearance::Icon {
-                        key: appearance_text,
+                        key_lower: appearance_text.to_lowercase(),
                         rotate_degrees,
                         flip,
                     }
