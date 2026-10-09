@@ -19,6 +19,7 @@ pub mod tile_contents;
 pub mod tile_usages;
 pub mod word_trait;
 pub mod line_segment;
+pub mod clue_text;
 
 
 pub use crate::prelude::*;
