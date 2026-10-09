@@ -23,6 +23,7 @@ pub mod clue_text;
 
 
 pub use crate::prelude::*;
+pub use simple_color::*;
 
 pub mod prelude {
 

@@ -21,7 +21,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
     ///Usually the attribution
     fn extra_info(&self) -> Option<Ustr>;
 
-    fn special_colors(&self) -> Option<&[bevy_color::prelude::Srgba]>;
+    fn special_colors(&self) -> Option<&[simple_color::Srgba]>;
 
     ///human readable data string
     fn tsv_line(&self, title: &str, special_characters: &SpecialCharacters) -> String {
@@ -153,7 +153,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         &self,
         special_characters: &SpecialCharacters,
         solution: &Solution<GRID_SIZE>,
-        word_line_colors: &[bevy_color::prelude::Srgba],
+        word_line_colors: &[simple_color::Srgba],
     ) -> String {
         crate::draw_grid::draw::<GRID_SIZE, Self::Layout>(
             self,
@@ -662,9 +662,9 @@ mod tests {
             &crate::special_characters::SpecialCharacters::NONE,
             &ArrayVec::from_iter([GridTile(0), GridTile(1), GridTile(2), GridTile(5)]),
             &[
-                bevy_color::prelude::Srgba::GREEN,
-                bevy_color::prelude::Srgba::BLUE,
-                bevy_color::prelude::Srgba::RED,
+                simple_color::Srgba::GREEN,
+                simple_color::Srgba::BLUE,
+                simple_color::Srgba::RED,
             ],
         );
 

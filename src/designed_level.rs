@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use crate::{grid_layout::GridLayout, level_trait::LevelTrait, prelude::*};
 use base64::DecodeError;
-use bevy_color::Srgba;
+use simple_color::Srgba;
 use itertools::Itertools;
 use log::{error, info, warn};
 use ustr::Ustr;
@@ -276,7 +276,7 @@ impl<const GRID_SIZE: usize, Layout: GridLayout<GRID_SIZE>> LevelTrait<GRID_SIZE
         self.extra_info
     }
 
-    fn special_colors(&self) -> Option<&[bevy_color::prelude::Srgba]> {
+    fn special_colors(&self) -> Option<&[simple_color::Srgba]> {
         match &self.special_colors {
             Some(sc) => Some(sc.as_slice()),
             None => None,

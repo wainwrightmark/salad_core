@@ -1,4 +1,4 @@
-use bevy_color::prelude::Srgba;
+use simple_color::Srgba;
 use glam::{Vec2, prelude::FloatExt};
 
 use crate::{

@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 ustr = { version = ">=1.1", features = ["serde"] }
 itertools = ">=0.14"
-glam = ">=0.33"
+glam = ">=0.34"
 anyhow = ">=1"
 arrayvec = { version = ">=0.7", features = ["serde"] }
 serde = { version = ">=1", features = ["derive", "rc"] }
@@ -17,7 +17,8 @@ hashbrown =  ">=0.17"
 num-derive = ">=0.4"
 num-traits = ">=0.2"
 base64 = ">=0.22"
-bevy_color = ">=0.19"
+#simple_color = {path='C:\Source\rust\simple_color'}
+simple_color = {git='https://github.com/wainwrightmark/simple_color'}
 log = ">=0.4"
 const_sized_bit_set = { version = ">=0.5", features = ["serde"] }
 unicode-normalization = ">=0.1"

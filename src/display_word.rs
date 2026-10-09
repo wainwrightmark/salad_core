@@ -57,7 +57,7 @@ impl<const GRID_SIZE: usize> WordTrait<GRID_SIZE> for DisplayWord<GRID_SIZE> {
     }
 }
 
-static COLORS_MAP: LazyLock<BTreeMap<&[Character], bevy_color::Srgba>> = LazyLock::new(|| {
+static COLORS_MAP: LazyLock<BTreeMap<&[Character], simple_color::Srgba>> = LazyLock::new(|| {
     let pairs: &[(&'static str, u8, u8, u8)] = &[
         ("Aquamarine", 0x7f, 0xff, 0xd4),
         ("Azure", 0x00, 0x7f, 0xff),
@@ -138,7 +138,7 @@ static COLORS_MAP: LazyLock<BTreeMap<&[Character], bevy_color::Srgba>> = LazyLoc
             &crate::special_characters::SpecialCharacters::NONE,
         )
         .unwrap();
-        let color: bevy_color::Srgba = bevy_color::Srgba::rgb_u8(*r, *g, *b);
+        let color: simple_color::Srgba = simple_color::Srgba::rgb_u8(*r, *g, *b);
         let slice: &[Character] = Box::leak(name.to_vec().into_boxed_slice());
         (slice, color)
     });
@@ -148,7 +148,7 @@ static COLORS_MAP: LazyLock<BTreeMap<&[Character], bevy_color::Srgba>> = LazyLoc
 
 impl<const GRID_SIZE: usize> DisplayWord<GRID_SIZE> {
 
-    pub fn custom_color(&self) -> Option<bevy_color::Srgba> {
+    pub fn custom_color(&self) -> Option<simple_color::Srgba> {
         COLORS_MAP.get(&self.characters.as_slice()).cloned()
     }
 

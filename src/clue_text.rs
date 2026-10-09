@@ -5,7 +5,7 @@ use std::{
 };
 
 use crate::{icon_paths::IconPathData, prelude::BasicWordTrait};
-use bevy_color::prelude::Srgba;
+use simple_color::Srgba;
 use const_sized_bit_set::prelude::{BitSet, BitSet32};
 use serde::{Deserialize, Serialize};
 use strum::EnumIs;
@@ -572,9 +572,9 @@ mod tests {
             font_size: 12.0,
             font_family: "montserrat",
             icons_font_family: "gameicons",
-            fill: bevy_color::prelude::Srgba::BLACK,
-            special_text_fill: bevy_color::prelude::Srgba::BLUE,
-            word_length_fill: bevy_color::prelude::Srgba::rgb_u8(127, 127, 127),
+            fill: simple_color::Srgba::BLACK,
+            special_text_fill: simple_color::Srgba::BLUE,
+            word_length_fill: simple_color::Srgba::rgb_u8(127, 127, 127),
         };
 
 		let icons_paths = IconPathData::new(LazyLock::new(|| "sun".lines().collect()));
