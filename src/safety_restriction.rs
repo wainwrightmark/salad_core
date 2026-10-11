@@ -20,7 +20,7 @@ use crate::prelude::{Grid, GridLayout, GridSet, WordTrait};
     Display,
     EnumString,
     AsRefStr,
-    EnumIter
+    EnumIter,
 )]
 pub enum SafetyRestriction {
     #[default]

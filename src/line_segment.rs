@@ -5,7 +5,9 @@ use itertools::Itertools;
 
 use crate::prelude::{GridLayout, GridTile, Solution};
 
-pub fn make_line_segments<const GRID_SIZE: usize, LayoutType: GridLayout<GRID_SIZE>> (solution: Solution<GRID_SIZE>) -> ArrayVec<LineSegment, 18> {
+pub fn make_line_segments<const GRID_SIZE: usize, LayoutType: GridLayout<GRID_SIZE>>(
+    solution: Solution<GRID_SIZE>,
+) -> ArrayVec<LineSegment, 18> {
     if let Ok(&s) = solution.iter().exactly_one() {
         return ArrayVec::from_iter([LineSegment {
             from: s,

@@ -56,7 +56,10 @@ impl TileContents {
                             flip: false,
                             rotate_degrees: 0,
                         };
-                        log::warn!("Could not get icon '{key_lower}' from {} icon paths", icon_paths.len());
+                        log::warn!(
+                            "Could not get icon '{key_lower}' from {} icon paths",
+                            icon_paths.len()
+                        );
                     }
                 },
                 SpecialCharacterAppearance::Text {

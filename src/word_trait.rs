@@ -8,7 +8,11 @@ use crate::grid_layout::GridLayout;
 use crate::prelude::*;
 use crate::{Character, Grid, GridSet, GridTile, Solution};
 
-pub struct WordSolutionIter<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool> {
+pub struct WordSolutionIter<
+    const GRID_SIZE: usize,
+    LAYOUT: GridLayout<GRID_SIZE>,
+    const BLANKS_ARE_WILDCARDS: bool,
+> {
     characters: ArrayVec<Character, GRID_SIZE>,
     grid: Grid<GRID_SIZE>,
 
@@ -17,7 +21,9 @@ pub struct WordSolutionIter<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE
     phantom: PhantomData<LAYOUT>,
 }
 
-impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool> WordSolutionIter<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS> {
+impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool>
+    WordSolutionIter<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>
+{
     pub fn new(characters: ArrayVec<Character, GRID_SIZE>, grid: Grid<GRID_SIZE>) -> Self {
         let next_first_tile: Option<GridTile> = if let Some(first_char) = characters.first() {
             grid.enumerate()
@@ -47,12 +53,12 @@ struct WSIState<const GRID_SIZE: usize> {
     char_to_find: Character,
 }
 
-impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool> Iterator
-    for WordSolutionIter<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>
+impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool>
+    Iterator for WordSolutionIter<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>
 {
     type Item = Solution<GRID_SIZE>;
 
-    fn next(&mut self) -> Option<Self::Item> {        
+    fn next(&mut self) -> Option<Self::Item> {
         //TODO more efficient path if word has no duplicate letters
 
         loop {
@@ -63,7 +69,8 @@ impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WIL
                 ) {
                     state.current_index += 1;
 
-                    if (self.grid[adjacent_tile] == state.char_to_find || (BLANKS_ARE_WILDCARDS && self.grid[adjacent_tile].is_blank()))
+                    if (self.grid[adjacent_tile] == state.char_to_find
+                        || (BLANKS_ARE_WILDCARDS && self.grid[adjacent_tile].is_blank()))
                         && !state.used_tiles.contains_const(adjacent_tile.0 as u32)
                     {
                         //we need to go deeper
@@ -112,7 +119,7 @@ impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WIL
             } else if let Some(first_tile) = self.next_first_tile {
                 self.next_first_tile = {
                     let mut current: GridTile = first_tile;
-                    let Some(first_char)  = self.characters.get(0).cloned() else{
+                    let Some(first_char) = self.characters.get(0).cloned() else {
                         return None; //word is empty;
                     };
                     //let first_char = self.grid[first_tile];
@@ -120,7 +127,9 @@ impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WIL
                         if let Some(n) = current.try_next::<GRID_SIZE>() {
                             current = n;
 
-                            if self.grid[current] == first_char || (BLANKS_ARE_WILDCARDS && self.grid[current].is_blank()) {
+                            if self.grid[current] == first_char
+                                || (BLANKS_ARE_WILDCARDS && self.grid[current].is_blank())
+                            {
                                 break Some(current);
                             }
                         } else {
@@ -237,17 +246,16 @@ pub trait BasicWordTrait: Clone + PartialEq + PartialOrd {
                 }
 
                 NormalizedCharacterResult::SpecialCharacter {
-                    character:_,
+                    character: _,
                     first_grapheme,
                     additional_graphemes,
-                    
                 } => match hints_left.checked_sub(1) {
                     Some(new_hints_left) => {
                         result.push_str(first_grapheme);
                         for g in additional_graphemes {
                             result.push_str(g);
                         }
-                        
+
                         hints_left = new_hints_left;
                     }
                     None => {
@@ -295,7 +303,7 @@ pub trait WordTrait<const GRID_SIZE: usize>: BasicWordTrait {
     ) -> Option<Solution<GRID_SIZE>> {
         WordSolutionIter::<GRID_SIZE, LAYOUT, false>::new(self.characters().clone(), grid).next()
     }
-    
+
     fn find_solutions_blanks_as_wildcards<LAYOUT: GridLayout<GRID_SIZE>>(
         &self,
         grid: Grid<GRID_SIZE>,
@@ -343,8 +351,7 @@ pub trait WordTrait<const GRID_SIZE: usize>: BasicWordTrait {
     }
 }
 
-impl<const GRID_SIZE: usize> BasicWordTrait for CharsArray<GRID_SIZE>
-{
+impl<const GRID_SIZE: usize> BasicWordTrait for CharsArray<GRID_SIZE> {
     fn text(&self) -> Ustr {
         self.iter().join("").into()
     }
@@ -354,7 +361,7 @@ impl<const GRID_SIZE: usize> BasicWordTrait for CharsArray<GRID_SIZE>
     }
 }
 
-impl<const GRID_SIZE: usize> WordTrait<GRID_SIZE> for CharsArray<GRID_SIZE>{
+impl<const GRID_SIZE: usize> WordTrait<GRID_SIZE> for CharsArray<GRID_SIZE> {
     fn characters(&self) -> &ArrayVec<Character, GRID_SIZE> {
         &self
     }
@@ -446,7 +453,9 @@ mod tests {
         let mut results: Vec<SolutionResult> = vec![];
 
         for (index, word) in level.words.iter().enumerate() {
-            let solutions = word.find_solutions_blanks_as_wildcards::<Square16Layout>(grid).collect_vec();
+            let solutions = word
+                .find_solutions_blanks_as_wildcards::<Square16Layout>(grid)
+                .collect_vec();
 
             results.push(SolutionResult {
                 word: word.text.to_string(),
@@ -481,21 +490,19 @@ mod tests {
     }
 
     #[test]
-    pub fn test_find_solution_blanks_as_wildcards(){
-
+    pub fn test_find_solution_blanks_as_wildcards() {
         let grid: Grid<19> = try_make_grid("P_ESITGATROLNEWNRMO").unwrap();
 
         let word = DisplayWord::from_string("Strix", &SpecialCharacters::NONE).unwrap();
 
-        let Some(solution)  = word.find_solutions_blanks_as_wildcards::<Hexagon19ThinLayout>(grid).next()
-        else{
+        let Some(solution) = word
+            .find_solutions_blanks_as_wildcards::<Hexagon19ThinLayout>(grid)
+            .next()
+        else {
             panic!("Could not find solution")
         };
         let letters = solution.iter().map(|x| grid[*x].as_char()).join("");
 
         assert_eq!(letters, "STRI_");
     }
-
-
-    
 }

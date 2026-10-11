@@ -5,9 +5,9 @@ use std::{
 };
 
 use crate::{icon_paths::IconPathData, prelude::BasicWordTrait};
-use simple_color::Srgba;
 use const_sized_bit_set::prelude::{BitSet, BitSet32};
 use serde::{Deserialize, Serialize};
+use simple_color::Srgba;
 use strum::EnumIs;
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -287,8 +287,8 @@ impl FromStr for ClueText {
             }
 
             let c = &right[0..1];
-			remaining_slice = &right[1..];
-            //let mut r = 
+            remaining_slice = &right[1..];
+            //let mut r =
 
             match c {
                 NEWLINE_CHARACTER_STR => segments.push(ClueTextSegment::NewLine),
@@ -304,16 +304,17 @@ impl FromStr for ClueText {
                 COLOR_ACCENT_CONTROL_CHARACTER_STR => {
                     segments.push(ClueTextSegment::TextModifier(TextModifier::ColorAccent))
                 }
-				ICON_CONTROL_CHARACTER_STR => {
-					let (icon_name, remainder) = match remaining_slice.split_once(" "){
-							Some((l,r)) => (l,r),
-							None => (remaining_slice, ""),
-						};
-						remaining_slice = remainder;
+                ICON_CONTROL_CHARACTER_STR => {
+                    let (icon_name, remainder) = match remaining_slice.split_once(" ") {
+                        Some((l, r)) => (l, r),
+                        None => (remaining_slice, ""),
+                    };
+                    remaining_slice = remainder;
 
-						segments.push(ClueTextSegment::Icon { name_lower: icon_name.to_lowercase() });
-
-				}
+                    segments.push(ClueTextSegment::Icon {
+                        name_lower: icon_name.to_lowercase(),
+                    });
+                }
 
                 x => {
                     if let Ok(first_digit) = x.parse::<usize>() {
@@ -322,7 +323,8 @@ impl FromStr for ClueText {
                             total *= 10;
                             total += next_digit as usize;
                         }
-                        remaining_slice = remaining_slice.trim_start_matches(|c: char| c.is_digit(10));
+                        remaining_slice =
+                            remaining_slice.trim_start_matches(|c: char| c.is_digit(10));
 
                         match NonZeroUsize::new(total) {
                             Some(x) => segments.push(ClueTextSegment::AnswerNumber(x)),
@@ -381,7 +383,7 @@ impl ClueText {
             height,
             font_size,
             font_family,
-			icons_font_family,
+            icons_font_family,
             fill,
             special_text_fill,
             word_length_fill,
@@ -524,7 +526,7 @@ impl ClueText {
         args: ClueTextSVGArgs,
         solved_clues: BitSet32,
         clue_words: &[W],
-		icon_paths: &IconPathData,
+        icon_paths: &IconPathData,
     ) -> String {
         const MAX_LINE_LENGTH: usize = 30;
         let lines = self.split_into_lines(MAX_LINE_LENGTH, solved_clues, clue_words);
@@ -577,9 +579,10 @@ mod tests {
             word_length_fill: simple_color::Srgba::rgb_u8(127, 127, 127),
         };
 
-		let icons_paths = IconPathData::new(LazyLock::new(|| "sun".lines().collect()));
+        let icons_paths = IconPathData::new(LazyLock::new(|| "sun".lines().collect()));
 
-        let svg = clue.write_svg_element::<DisplayWord<19>>(args, BitSet32::EMPTY, &[], &icons_paths);
+        let svg =
+            clue.write_svg_element::<DisplayWord<19>>(args, BitSet32::EMPTY, &[], &icons_paths);
 
         let svg = format!(
             r#"<svg xmlns="http://www.w3.org/2000/svg"" style=" background:white" viewBox="0 0 200 50">

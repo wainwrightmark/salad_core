@@ -140,7 +140,11 @@ impl FSTHelper {
         }
     }
 
-    pub fn find_all_words<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>,const BLANKS_ARE_WILDCARDS: bool,>(
+    pub fn find_all_words<
+        const GRID_SIZE: usize,
+        LAYOUT: GridLayout<GRID_SIZE>,
+        const BLANKS_ARE_WILDCARDS: bool,
+    >(
         grid: &Grid<GRID_SIZE>,
         wa: &impl FST<Character>,
         special_characters: &SpecialCharacters,
@@ -172,7 +176,11 @@ impl FSTHelper {
         result
     }
 
-    pub fn count_words<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool,>(
+    pub fn count_words<
+        const GRID_SIZE: usize,
+        LAYOUT: GridLayout<GRID_SIZE>,
+        const BLANKS_ARE_WILDCARDS: bool,
+    >(
         grid: &Grid<GRID_SIZE>,
         wa: &impl FST<Character>,
         special_characters: &SpecialCharacters,
@@ -386,8 +394,11 @@ mod tests {
 
         let grid = try_make_grid::<16>("VENMOUAULTRSHPEN").unwrap();
 
-        let grid_words =
-            FSTHelper::find_all_words::<16, Square16Layout, false>(&grid, &wa, &SpecialCharacters::NONE);
+        let grid_words = FSTHelper::find_all_words::<16, Square16Layout, false>(
+            &grid,
+            &wa,
+            &SpecialCharacters::NONE,
+        );
 
         let found_words = grid_words
             .iter()
@@ -399,7 +410,7 @@ mod tests {
             "earth, mars, neptune, pluto, saturn, uranus, venus", //Should be in alphabetical order
         )
     }
-    
+
     #[test]
     pub fn test_on_grid_blanks_as_wildcards() {
         let special_characters = SpecialCharacters::NONE;
@@ -421,8 +432,11 @@ mod tests {
 
         let grid = try_make_grid::<16>("VENMOUAULTRSHPE_").unwrap();
 
-        let grid_words =
-            FSTHelper::find_all_words::<16, Square16Layout, true>(&grid, &wa, &SpecialCharacters::NONE);
+        let grid_words = FSTHelper::find_all_words::<16, Square16Layout, true>(
+            &grid,
+            &wa,
+            &SpecialCharacters::NONE,
+        );
 
         let found_words = grid_words
             .iter()

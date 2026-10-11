@@ -1,4 +1,5 @@
 pub mod character;
+pub mod clue_text;
 pub mod complete_solve;
 pub mod designed_level;
 pub mod display_word;
@@ -10,6 +11,7 @@ pub mod grid_tile;
 pub mod icon_paths;
 pub mod letter_counts;
 pub mod level_trait;
+pub mod line_segment;
 pub mod normalized_character_iterator;
 pub mod possible_paths;
 pub mod safety_restriction;
@@ -18,9 +20,6 @@ pub mod svg_hexagon;
 pub mod tile_contents;
 pub mod tile_usages;
 pub mod word_trait;
-pub mod line_segment;
-pub mod clue_text;
-
 
 pub use crate::prelude::*;
 pub use simple_color::*;

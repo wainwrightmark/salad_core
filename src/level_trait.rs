@@ -4,8 +4,7 @@ use ustr::Ustr;
 
 use super::word_trait::WordTrait;
 use crate::{
-    Character, Grid, GridSet, GridTile, grid_layout::GridLayout, prelude::*,
-    special_characters::SpecialCharacters, tile_usages::TileUsages, word_trait::BasicWordTrait,
+    Character, Grid, GridSet, GridTile, grid_layout::GridLayout, icon_paths::IconPathData, prelude::*, special_characters::SpecialCharacters, tile_usages::TileUsages, word_trait::BasicWordTrait,
 };
 
 pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
@@ -140,12 +139,17 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         true
     }
 
-    fn draw_grid_svg(&self, special_characters: &SpecialCharacters) -> String {
+    fn draw_grid_svg(
+        &self,
+        special_characters: &SpecialCharacters,
+        icon_path_data: &IconPathData,
+    ) -> String {
         crate::draw_grid::draw::<GRID_SIZE, Self::Layout>(
             self,
             special_characters,
             &Solution::new(),
             &[],
+            icon_path_data,
         )
     }
 
@@ -154,12 +158,14 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         special_characters: &SpecialCharacters,
         solution: &Solution<GRID_SIZE>,
         word_line_colors: &[simple_color::Srgba],
+        icon_path_data: &IconPathData,
     ) -> String {
         crate::draw_grid::draw::<GRID_SIZE, Self::Layout>(
             self,
             special_characters,
             solution,
             word_line_colors,
+            icon_path_data,
         )
     }
 
@@ -169,6 +175,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         subtitle: &str,
         modifiers: &crate::draw_paper::DrawPaperModifiers,
         special_characters: &SpecialCharacters,
+        //todo IconPathData
     ) -> String {
         crate::draw_paper::draw::<GRID_SIZE, Self::Layout>(
             self,
@@ -541,9 +548,7 @@ mod tests {
     use std::str::FromStr;
 
     use crate::{
-        draw_paper::AllDrawPaperModifiers,
-        grid_layout::{Hexagon19FatLayout, Square16Layout},
-        prelude::*,
+        draw_paper::AllDrawPaperModifiers, grid_layout::{Hexagon19FatLayout, Square16Layout}, icon_paths::IconPathData, prelude::*,
     };
 
     #[test]
@@ -592,7 +597,7 @@ mod tests {
         )
         .unwrap();
 
-        let svg = level1.draw_grid_svg(&crate::special_characters::SpecialCharacters::NONE);
+        let svg = level1.draw_grid_svg(&crate::special_characters::SpecialCharacters::NONE, &IconPathData::EMPTY);
 
         let svg = svg.replace(
             r#"xmlns="http://www.w3.org/2000/svg""#,
@@ -625,7 +630,7 @@ mod tests {
         )
         .unwrap();
 
-        let svg = level1.draw_grid_svg(&crate::special_characters::SpecialCharacters::NONE);
+        let svg = level1.draw_grid_svg(&crate::special_characters::SpecialCharacters::NONE, &IconPathData::EMPTY);
 
         let svg = svg.replace(
             r#"xmlns="http://www.w3.org/2000/svg""#,
@@ -666,6 +671,7 @@ mod tests {
                 simple_color::Srgba::BLUE,
                 simple_color::Srgba::RED,
             ],
+            &IconPathData::EMPTY
         );
 
         let svg = svg.replace(

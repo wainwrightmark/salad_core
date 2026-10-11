@@ -3,6 +3,8 @@ use std::sync::LazyLock;
 pub struct IconPathData(LazyLock<Vec<&'static str>>);
 
 impl IconPathData {
+    pub const EMPTY: Self = Self(LazyLock::new(|| Vec::new()));
+
     pub const fn new(lazy_lock: LazyLock<Vec<&'static str>>) -> Self {
         Self(lazy_lock)
     }
@@ -24,8 +26,8 @@ impl IconPathData {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::LazyLock;
     use crate::icon_paths::IconPathData;
+    use std::sync::LazyLock;
 
     const PATHS_DATA: &'static str = r#"suits
 summits

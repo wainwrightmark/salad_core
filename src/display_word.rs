@@ -147,7 +147,6 @@ static COLORS_MAP: LazyLock<BTreeMap<&[Character], simple_color::Srgba>> = LazyL
 });
 
 impl<const GRID_SIZE: usize> DisplayWord<GRID_SIZE> {
-
     pub fn custom_color(&self) -> Option<simple_color::Srgba> {
         COLORS_MAP.get(&self.characters.as_slice()).cloned()
     }

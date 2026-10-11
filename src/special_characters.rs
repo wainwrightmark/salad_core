@@ -82,8 +82,7 @@ impl SpecialCharacter {
     pub fn try_parse(text: &str) -> Result<Self, &'static str> {
         let (text, appearance) = match text.split_once(SPECIAL_CHARACTER_ICON_DELIMITER) {
             Some((text, appearance_data)) => {
-                let (appearance_text, is_icon, remainder) = match appearance_data
-                    .strip_prefix(':')
+                let (appearance_text, is_icon, remainder) = match appearance_data.strip_prefix(':')
                 {
                     Some(appearance_data) => {
                         let (l, r) =
@@ -345,7 +344,8 @@ mod tests {
     use itertools::Itertools;
 
     use crate::{
-        character::normalize_characters_array, prelude::{NormalizedCharacterIterator, SpecialCharacter, SpecialCharacters},
+        character::normalize_characters_array,
+        prelude::{NormalizedCharacterIterator, SpecialCharacter, SpecialCharacters},
     };
     use test_case::test_case;
 
@@ -440,10 +440,9 @@ mod tests {
         );
     }
 
-
     #[test_case("police:police-badge:r180:f")]
     #[test_case("one::1:r180:f")]
-    pub fn test_special_character_parsing(sc_string: &str){
+    pub fn test_special_character_parsing(sc_string: &str) {
         let sc = SpecialCharacter::try_parse(sc_string).unwrap();
 
         let actual = sc.to_string();

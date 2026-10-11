@@ -460,7 +460,7 @@ mod tests {
     };
     use itertools::Itertools;
     use test_case::test_case;
-    
+
     /* spellchecker:disable */
     #[test_case("abcd", "ab cd")]
     #[test_case("dali", "Dalí")]
