@@ -350,10 +350,6 @@ impl FromStr for ClueText {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ClueTextSVGArgs {
-    /// Position of top left
-    pub x: f32,
-    /// Position of top left
-    pub y: f32,
     pub width: f32,
     pub height: f32,
     pub font_size: f32,
@@ -377,8 +373,6 @@ impl ClueText {
         icon_paths: &IconPathData,
     ) -> String {
         let ClueTextSVGArgs {
-            x,
-            y,
             width,
             height,
             font_size,
@@ -390,7 +384,7 @@ impl ClueText {
         } = args;
 
         let mut svg = String::new();
-        let center_x = x + (width * 0.5); //
+        let center_x = width * 0.5;
 
         let fill = fill.to_hex();
         let word_length_fill = word_length_fill.to_hex();
@@ -412,7 +406,7 @@ impl ClueText {
         for (line_index, line) in lines.iter().enumerate() {
             let numerator = line_index + 1;
             let denominator = lines.len() + 1;
-            let line_y = ((numerator as f32 * height) / (denominator as f32)) + y;
+            let line_y = (numerator as f32 * height) / (denominator as f32);
 
             write!(
                 &mut svg,
@@ -567,8 +561,6 @@ mod tests {
         clue.push_segment(super::ClueTextSegment::WordLength("(5,6)".to_string()));
 
         let args = super::ClueTextSVGArgs {
-            x: 0.0,
-            y: 0.0,
             width: 200.0,
             height: 50.0,
             font_size: 12.0,
