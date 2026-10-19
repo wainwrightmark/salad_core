@@ -4,7 +4,10 @@ use std::{
     str::FromStr,
 };
 
-use crate::{icon_paths::IconPathData, prelude::BasicWordTrait};
+use crate::{
+    color_scheme::ColorSchemeChoice, colors::ColorScheme, icon_paths::IconPathData,
+    prelude::BasicWordTrait,
+};
 use const_sized_bit_set::prelude::{BitSet, BitSet32};
 use serde::{Deserialize, Serialize};
 use simple_color::Srgba;
@@ -42,12 +45,13 @@ impl ClueText {
         max_line_length: usize,
         solved_clues: BitSet32,
         clue_words: &[W],
+        color_scheme: ColorSchemeChoice,
     ) -> Vec<Vec<ClueTextSegment>> {
         if !self.segments.iter().any(|x| x.is_new_line()) {
             let total_characters: usize = self
                 .segments
                 .iter()
-                .map(|x| x.num_chars(solved_clues, clue_words))
+                .map(|x| x.num_chars(solved_clues, clue_words, color_scheme))
                 .sum();
             if total_characters <= max_line_length {
                 return vec![self.segments.clone()];
@@ -69,7 +73,7 @@ impl ClueText {
                 continue;
             }
 
-            let segment_chars = clue_text_segment.num_chars(solved_clues, clue_words);
+            let segment_chars = clue_text_segment.num_chars(solved_clues, clue_words, color_scheme);
             if current_line_characters + segment_chars <= max_line_length {
                 current_line_segments.push(segments_iter.next().unwrap());
                 current_line_characters += segment_chars;
@@ -132,10 +136,17 @@ pub enum ClueTextSegment {
 
     NewLine,
     Icon { name_lower: String },
+
+    ColorName { is_alternate: bool },
 }
 
 impl ClueTextSegment {
-    pub fn num_chars<W: BasicWordTrait>(&self, solved_clues: BitSet32, clue_words: &[W]) -> usize {
+    pub fn num_chars<W: BasicWordTrait>(
+        &self,
+        solved_clues: BitSet32,
+        clue_words: &[W],
+        color_scheme: ColorSchemeChoice,
+    ) -> usize {
         match self {
             ClueTextSegment::AnswerNumber(n) => {
                 let index = n.get().saturating_sub(1);
@@ -154,6 +165,13 @@ impl ClueTextSegment {
             ClueTextSegment::WordLength(w) => w.len(),
             ClueTextSegment::NewLine => 0,
             ClueTextSegment::Icon { .. } => 1,
+            ClueTextSegment::ColorName { is_alternate } => {
+                if *is_alternate {
+                    color_scheme.accent_color_name_alternate().len()
+                } else {
+                    color_scheme.accent_color_name().len()
+                }
+            }
         }
     }
 
@@ -182,6 +200,7 @@ impl ClueTextSegment {
             ClueTextSegment::WordLength(_) => None,
             ClueTextSegment::NewLine => None,
             ClueTextSegment::Icon { .. } => None,
+            ClueTextSegment::ColorName { .. } => None,
         }
     }
 }
@@ -193,6 +212,7 @@ pub enum TextModifier {
     Italic,
     AnswersBlock,
     ColorAccent,
+    ColorAccentAlternate,
 }
 
 const BOLD_CONTROL_CHARACTER: char = 'b';
@@ -204,6 +224,15 @@ const ANSWERS_BLOCK_CONTROL_CHARACTER_STR: &str = "a";
 
 const COLOR_ACCENT_CONTROL_CHARACTER: char = 'c';
 const COLOR_ACCENT_CONTROL_CHARACTER_STR: &str = "c";
+
+const COLOR_ACCENT_ALTERNATE_CONTROL_CHARACTER: char = 'd';
+const COLOR_ACCENT_ALTERNATE_CONTROL_CHARACTER_STR: &str = "d";
+
+const COLOR_NAME_CONTROL_CHARACTER: char = 'p';
+const COLOR_NAME_CONTROL_CHARACTER_STR: &str = "p";
+
+const COLOR_NAME_ALTERNATE_CONTROL_CHARACTER: char = 'q';
+const COLOR_NAME_ALTERNATE_CONTROL_CHARACTER_STR: &str = "q";
 
 const NEWLINE_CHARACTER: char = 'n';
 const NEWLINE_CHARACTER_STR: &str = "n";
@@ -217,6 +246,16 @@ impl Display for ClueTextSegment {
             ClueTextSegment::NewLine => {
                 f.write_char('\\')?;
                 f.write_char(NEWLINE_CHARACTER)
+            }
+
+            ClueTextSegment::ColorName { is_alternate } => {
+                f.write_char('\\')?;
+                let c = if *is_alternate {
+                    COLOR_NAME_ALTERNATE_CONTROL_CHARACTER
+                } else {
+                    COLOR_NAME_CONTROL_CHARACTER
+                };
+                f.write_char(c)
             }
 
             ClueTextSegment::WordLength(wl) => wl.fmt(f),
@@ -237,6 +276,7 @@ impl Display for ClueTextSegment {
                     TextModifier::Italic => ITALICS_CONTROL_CHARACTER,
                     TextModifier::AnswersBlock => ANSWERS_BLOCK_CONTROL_CHARACTER,
                     TextModifier::ColorAccent => COLOR_ACCENT_CONTROL_CHARACTER,
+                    TextModifier::ColorAccentAlternate => COLOR_ACCENT_ALTERNATE_CONTROL_CHARACTER,
                 };
                 f.write_char('\\')?;
                 f.write_char(c)
@@ -304,6 +344,18 @@ impl FromStr for ClueText {
                 COLOR_ACCENT_CONTROL_CHARACTER_STR => {
                     segments.push(ClueTextSegment::TextModifier(TextModifier::ColorAccent))
                 }
+                COLOR_ACCENT_ALTERNATE_CONTROL_CHARACTER_STR => segments.push(
+                    ClueTextSegment::TextModifier(TextModifier::ColorAccentAlternate),
+                ),
+                COLOR_NAME_CONTROL_CHARACTER_STR => {
+                    segments.push(ClueTextSegment::ColorName {
+                        is_alternate: false,
+                    });
+                }
+                COLOR_NAME_ALTERNATE_CONTROL_CHARACTER_STR => {
+                    segments.push(ClueTextSegment::ColorName { is_alternate: true });
+                }
+
                 ICON_CONTROL_CHARACTER_STR => {
                     let (icon_name, remainder) = match remaining_slice.split_once(" ") {
                         Some((l, r)) => (l, r),
@@ -355,9 +407,7 @@ pub struct ClueTextSVGArgs {
     pub font_size: f32,
     pub font_family: &'static str,
     pub icons_font_family: &'static str,
-    pub fill: Srgba,
-    pub special_text_fill: Srgba,
-    pub word_length_fill: Srgba,
+    pub color_scheme_choice: ColorSchemeChoice,
 }
 
 impl ClueText {
@@ -378,17 +428,18 @@ impl ClueText {
             font_size,
             font_family,
             icons_font_family,
-            fill,
-            special_text_fill,
-            word_length_fill,
+            color_scheme_choice,
         } = args;
+
+        let color_scheme = color_scheme_choice.color_scheme();
 
         let mut svg = String::new();
         let center_x = width * 0.5;
 
-        let fill = fill.to_hex();
-        let word_length_fill = word_length_fill.to_hex();
-        let special_text_fill = special_text_fill.to_hex();
+        //let fill = color_scheme.type_dark;
+        let word_length_fill = color_scheme.type_dark;
+        let special_text_fill = color_scheme.accent_main;
+        //let special_text_fill_alternate = color_scheme.hint_main;
 
         //Note: use write! not writeln! as we are white-space:break-spaces
         write!(
@@ -398,10 +449,39 @@ impl ClueText {
 
         ).unwrap();
 
+        #[derive(Debug, EnumIs, Clone, Copy)]
+        enum TextColor {
+            Default,
+            Accent,
+            Alternate,
+        }
+
         let mut is_bold = false;
         let mut is_italic = false;
         let mut is_answers = false;
-        let mut is_color_accent = false;
+        let mut text_color = TextColor::Default;
+
+        fn get_weight_font_style_fill(
+            is_bold: bool,
+            is_italic: bool,
+            is_answers: bool,
+            text_color: TextColor,
+            color_scheme: &ColorScheme,
+        ) -> (i32, &'static str, Srgba) {
+            if is_answers {
+                (800, "normal", color_scheme.accent_main)
+            } else {
+                let weight = if is_bold { 700 } else { 600 };
+                let font_style = if is_italic { "italic" } else { "normal" };
+                let fill = match text_color {
+                    TextColor::Default => color_scheme.type_dark,
+                    TextColor::Accent => color_scheme.accent_main,
+                    TextColor::Alternate => color_scheme.hint_main,
+                };
+
+                (weight, font_style, fill)
+            }
+        }
 
         for (line_index, line) in lines.iter().enumerate() {
             let numerator = line_index + 1;
@@ -419,6 +499,23 @@ impl ClueText {
                         //Just skip
                     }
 
+                    ClueTextSegment::ColorName { is_alternate } => {
+                        let (weight, font_style, fill) = get_weight_font_style_fill(
+                            is_bold,
+                            is_italic,
+                            is_answers,
+                            text_color,
+                            color_scheme,
+                        );
+                        let text = if *is_alternate {
+                            color_scheme_choice.accent_color_name_alternate()
+                        } else {
+                            color_scheme_choice.accent_color_name()
+                        };
+
+                        write!(&mut svg, r#"<tspan font-size={font_size} font-weight="{weight}" font-style="{font_style}" fill={fill} dominant-baseline="central">{text}</tspan>"#).unwrap();
+                    }
+
                     ClueTextSegment::AnswerNumber(answer_number) => {
                         let index = answer_number.get().saturating_sub(1);
                         if solved_clues.contains_const(index as u32) {
@@ -434,19 +531,13 @@ impl ClueText {
                     }
 
                     ClueTextSegment::Icon { name_lower } => {
-                        let (weight, font_style, fill) = if is_answers {
-                            (800, "normal", &special_text_fill)
-                        } else {
-                            let weight = if is_bold { 700 } else { 600 };
-                            let font_style = if is_italic { "italic" } else { "normal" };
-                            let fill = if is_color_accent {
-                                &special_text_fill
-                            } else {
-                                &fill
-                            };
-
-                            (weight, font_style, fill)
-                        };
+                        let (weight, font_style, fill) = get_weight_font_style_fill(
+                            is_bold,
+                            is_italic,
+                            is_answers,
+                            text_color,
+                            color_scheme,
+                        );
                         match icon_paths.get_icon_character(name_lower) {
                             Some(char) => {
                                 write!(&mut svg, r#"<tspan font-family="{icons_font_family}" font-size={font_size} font-weight="{weight}" font-style="{font_style}" fill={fill} dominant-baseline="central">{char}</tspan>"#).unwrap();
@@ -458,36 +549,24 @@ impl ClueText {
                     }
 
                     ClueTextSegment::Text(text) => {
-                        let (weight, font_style, fill) = if is_answers {
-                            (800, "normal", &special_text_fill)
-                        } else {
-                            let weight = if is_bold { 700 } else { 600 };
-                            let font_style = if is_italic { "italic" } else { "normal" };
-                            let fill = if is_color_accent {
-                                &special_text_fill
-                            } else {
-                                &fill
-                            };
-
-                            (weight, font_style, fill)
-                        };
+                        let (weight, font_style, fill) = get_weight_font_style_fill(
+                            is_bold,
+                            is_italic,
+                            is_answers,
+                            text_color,
+                            color_scheme,
+                        );
 
                         write!(&mut svg, r#"<tspan font-size={font_size} font-weight="{weight}" font-style="{font_style}" fill={fill} dominant-baseline="central">{text}</tspan>"#).unwrap();
                     }
                     ClueTextSegment::Space => {
-                        let (weight, font_style, fill) = if is_answers {
-                            (800, "normal", &special_text_fill)
-                        } else {
-                            let weight = if is_bold { 700 } else { 600 };
-                            let font_style = if is_italic { "italic" } else { "normal" };
-                            let fill = if is_color_accent {
-                                &special_text_fill
-                            } else {
-                                &fill
-                            };
-
-                            (weight, font_style, fill)
-                        };
+                        let (weight, font_style, fill) = get_weight_font_style_fill(
+                            is_bold,
+                            is_italic,
+                            is_answers,
+                            text_color,
+                            color_scheme,
+                        );
 
                         write!(&mut svg, r#"<tspan font-size={font_size} font-weight="{weight}" font-style="{font_style}" fill={fill} dominant-baseline="central">&nbsp;</tspan>"#).unwrap();
                     }
@@ -495,7 +574,21 @@ impl ClueText {
                     ClueTextSegment::TextModifier(text_modifier) => match text_modifier {
                         TextModifier::Bold => is_bold = !is_bold,
                         TextModifier::Italic => is_italic = !is_italic,
-                        TextModifier::ColorAccent => is_color_accent = !is_color_accent,
+                        TextModifier::ColorAccent => {
+                            text_color = match text_color.clone() {
+                                TextColor::Default => TextColor::Accent,
+                                TextColor::Accent => TextColor::Default,
+                                TextColor::Alternate => TextColor::Accent,
+                            }
+                        }
+
+                        TextModifier::ColorAccentAlternate => {
+                            text_color = match text_color {
+                                TextColor::Default => TextColor::Alternate,
+                                TextColor::Accent => TextColor::Alternate,
+                                TextColor::Alternate => TextColor::Default,
+                            }
+                        }
 
                         TextModifier::AnswersBlock => is_answers = !is_answers,
                     },
@@ -523,7 +616,12 @@ impl ClueText {
         icon_paths: &IconPathData,
     ) -> String {
         const MAX_LINE_LENGTH: usize = 30;
-        let lines = self.split_into_lines(MAX_LINE_LENGTH, solved_clues, clue_words);
+        let lines = self.split_into_lines(
+            MAX_LINE_LENGTH,
+            solved_clues,
+            clue_words,
+            args.color_scheme_choice,
+        );
 
         Self::write_svg_element_from_lines(lines, args, solved_clues, clue_words, icon_paths)
     }
@@ -546,7 +644,9 @@ mod tests {
     #[test_case(r#"Hello \a World"#)]
     #[test_case(r#"Hello \i World"#)]
     #[test_case(r#"Hello \b World"#)]
-    #[test_case(r#"Hello World \i italics \b bold \n \a answer \1 number"#)]
+    #[test_case(
+        r#"Hello World \i italics \b bold \n \a answer \1 number\n \c Color: \p\c \d Alt \q\d"#
+    )]
     fn test_clue_text_round_trip(text: &str) {
         let clue = ClueText::from_str(text).unwrap();
         let actual = clue.to_string();
@@ -556,7 +656,7 @@ mod tests {
 
     #[test]
     fn test_clues_svg() {
-        let text = r#"Hello World \i italics \b bold \a ans \1 number \:sun \:sun sun"#;
+        let text = r#"Hello World \i italics \b bold \a ans \1 number \:sun \:sun sun\a \n \cColor: \p\c  \dAlt: \q\d "#;
         let mut clue = ClueText::from_str(text).unwrap();
         clue.push_segment(super::ClueTextSegment::WordLength("(5,6)".to_string()));
 
@@ -566,9 +666,7 @@ mod tests {
             font_size: 12.0,
             font_family: "montserrat",
             icons_font_family: "gameicons",
-            fill: simple_color::Srgba::BLACK,
-            special_text_fill: simple_color::Srgba::BLUE,
-            word_length_fill: simple_color::Srgba::rgb_u8(127, 127, 127),
+            color_scheme_choice: crate::color_scheme::ColorSchemeChoice::Light1,
         };
 
         let icons_paths = IconPathData::new(LazyLock::new(|| "sun".lines().collect()));
@@ -594,7 +692,8 @@ mod tests {
             }
             Err(_err) => {
                 std::fs::write(path, svg.clone()).unwrap();
-                insta::assert_snapshot!("test_clues_svg", svg);
+                panic!("Snapshot failed")
+                //insta::assert_snapshot!("test_clues_svg", svg);
             }
         }
     }

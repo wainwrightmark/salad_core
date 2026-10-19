@@ -20,6 +20,8 @@ pub mod svg_hexagon;
 pub mod tile_contents;
 pub mod tile_usages;
 pub mod word_trait;
+pub mod color_scheme;
+pub  mod colors;
 
 pub use crate::prelude::*;
 pub use simple_color::*;
