@@ -595,7 +595,7 @@ impl ClueText {
                     ClueTextSegment::WordLength(wl) => {
                         let smaller_font_size = (font_size * 15.0 / 18.0).round();
 
-                        write!(&mut svg, r#"<tspan font-size={smaller_font_size} font-weight="400" font-style="normal" fill={word_length_fill} dominant-baseline="central">{wl}</tspan>"#).unwrap();
+                        write!(&mut svg, r#"<tspan font-size={smaller_font_size} font-weight="700" font-style="normal" fill={word_length_fill} dominant-baseline="central">{wl}</tspan>"#).unwrap();
                     }
                 }
             }
