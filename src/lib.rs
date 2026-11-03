@@ -1,5 +1,7 @@
 pub mod character;
 pub mod clue_text;
+pub mod color_scheme;
+pub mod colors;
 pub mod complete_solve;
 pub mod designed_level;
 pub mod display_word;
@@ -20,8 +22,6 @@ pub mod svg_hexagon;
 pub mod tile_contents;
 pub mod tile_usages;
 pub mod word_trait;
-pub mod color_scheme;
-pub  mod colors;
 
 pub use crate::prelude::*;
 pub use simple_color::*;

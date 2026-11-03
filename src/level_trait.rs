@@ -4,7 +4,9 @@ use ustr::Ustr;
 
 use super::word_trait::WordTrait;
 use crate::{
-    Character, Grid, GridSet, GridTile, grid_layout::GridLayout, icon_paths::IconPathData, prelude::*, special_characters::SpecialCharacters, tile_usages::TileUsages, word_trait::BasicWordTrait,
+    Character, Grid, GridSet, GridTile, grid_layout::GridLayout, icon_paths::IconPathData,
+    prelude::*, special_characters::SpecialCharacters, tile_usages::TileUsages,
+    word_trait::BasicWordTrait,
 };
 
 pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
@@ -444,7 +446,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
                 return unneeded_tiles;
             };
 
-            needed_characters.0.union_with(&characters.0);
+            needed_characters = needed_characters.with_union(&characters);
         }
 
         let grid = self.grid();
@@ -459,15 +461,15 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
             return unneeded_tiles;
         };
 
-        let Some(potentially_redundant_characters) = remaining_characters
-            .0
-            .with_checked_difference(&needed_characters.0)
+        let Some(potentially_redundant_characters) =
+            remaining_characters.with_checked_difference(&needed_characters)
         else {
             //warn!("Remaining characters was not a superset of needed characters"); //todo add log to this crate
             return unneeded_tiles;
         };
 
         'character_groups: for (character, mut remaining_copies) in potentially_redundant_characters
+            .inner()
             .iter_element_groups()
             .map(|x| {
                 (
@@ -477,7 +479,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
             })
         {
             let character_tiles = grid.enumerate().filter(|x| x.1 == character).map(|x| x.0);
-            if needed_characters.0.element_count(character.as_u32()) > 0 {
+            if needed_characters.count_instances(character) > 0 {
                 //we have additional copies of this character - try removing them
                 'tiles_to_check: for tile in character_tiles {
                     if unneeded_tiles.contains_const(tile.inner_u32()) {
@@ -548,7 +550,10 @@ mod tests {
     use std::str::FromStr;
 
     use crate::{
-        draw_paper::AllDrawPaperModifiers, grid_layout::{Hexagon19FatLayout, Square16Layout}, icon_paths::IconPathData, prelude::*,
+        draw_paper::AllDrawPaperModifiers,
+        grid_layout::{Hexagon19FatLayout, Square16Layout},
+        icon_paths::IconPathData,
+        prelude::*,
     };
 
     #[test]
@@ -597,7 +602,10 @@ mod tests {
         )
         .unwrap();
 
-        let svg = level1.draw_grid_svg(&crate::special_characters::SpecialCharacters::NONE, &IconPathData::EMPTY);
+        let svg = level1.draw_grid_svg(
+            &crate::special_characters::SpecialCharacters::NONE,
+            &IconPathData::EMPTY,
+        );
 
         let svg = svg.replace(
             r#"xmlns="http://www.w3.org/2000/svg""#,
@@ -630,7 +638,10 @@ mod tests {
         )
         .unwrap();
 
-        let svg = level1.draw_grid_svg(&crate::special_characters::SpecialCharacters::NONE, &IconPathData::EMPTY);
+        let svg = level1.draw_grid_svg(
+            &crate::special_characters::SpecialCharacters::NONE,
+            &IconPathData::EMPTY,
+        );
 
         let svg = svg.replace(
             r#"xmlns="http://www.w3.org/2000/svg""#,
@@ -671,7 +682,7 @@ mod tests {
                 simple_color::Srgba::BLUE,
                 simple_color::Srgba::RED,
             ],
-            &IconPathData::EMPTY
+            &IconPathData::EMPTY,
         );
 
         let svg = svg.replace(

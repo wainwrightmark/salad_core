@@ -1,6 +1,5 @@
 use simple_color::Srgba;
 
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ColorScheme {
     pub background: Srgba,
@@ -176,12 +175,10 @@ pub const COLOR_SCHEME_DARK: ColorScheme = ColorScheme {
     type_grey: rgb_hex(0xAAB1B4),         // #AAB1B4
 };
 
-
-
 pub const fn rgb_hex(number: u32) -> Srgba {
     Srgba::rgb_hex(number)
 }
 
-pub const fn rgba_hex(number: u32) -> Srgba{
+pub const fn rgba_hex(number: u32) -> Srgba {
     Srgba::rgba_hex(number)
 }

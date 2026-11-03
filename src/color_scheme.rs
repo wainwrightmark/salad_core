@@ -11,22 +11,21 @@ pub enum ColorSchemeChoice {
 }
 
 impl ColorSchemeChoice {
-    pub const fn accent_color_name(&self)-> &'static str{
-        match self{
+    pub const fn accent_color_name(&self) -> &'static str {
+        match self {
             ColorSchemeChoice::Light1 => "blue",
             ColorSchemeChoice::Light2 => "orange",
             ColorSchemeChoice::Dark1 => "purple",
         }
     }
-    
-    pub const fn accent_color_name_alternate(&self)-> &'static str{
-        match self{
+
+    pub const fn accent_color_name_alternate(&self) -> &'static str {
+        match self {
             ColorSchemeChoice::Light1 => "orange",
             ColorSchemeChoice::Light2 => "purple",
             ColorSchemeChoice::Dark1 => "orange",
         }
     }
-
 
     pub const fn color_scheme(&self) -> &'static ColorScheme {
         match self {
