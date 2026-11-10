@@ -45,15 +45,15 @@ impl<const GRID_SIZE: usize> BasicWordTrait for DisplayWord<GRID_SIZE> {
     fn characters_slice(&self) -> &[Character] {
         &self.characters
     }
+
+    fn clue(&self) -> Option<Ustr> {
+        self.question_text
+    }
 }
 
 impl<const GRID_SIZE: usize> WordTrait<GRID_SIZE> for DisplayWord<GRID_SIZE> {
     fn characters(&self) -> &CharsArray<GRID_SIZE> {
         &self.characters
-    }
-
-    fn clue(&self) -> Option<Ustr> {
-        self.question_text
     }
 }
 

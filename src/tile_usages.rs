@@ -3,10 +3,7 @@ use itertools::Itertools;
 use ustr::Ustr;
 
 use crate::{
-    GridSet,
-    grid_layout::GridLayout,
-    level_trait::LevelTrait,
-    word_trait::{BasicWordTrait, WordTrait},
+    GridSet, grid_layout::GridLayout, level_trait::LevelTrait, word_trait::BasicWordTrait,
 };
 
 #[derive(Debug, PartialEq)]
@@ -22,7 +19,7 @@ impl<const GRID_SIZE: usize> TileUsages<GRID_SIZE> {
 
         for word in level.words().iter() {
             let tiles: GridSet = match word
-                .find_solutions::<LAYOUT>(level.grid())
+                .find_solutions::<GRID_SIZE, LAYOUT>(level.grid())
                 .map(|s| GridSet::from_iter(s.into_iter().map(|x| x.0 as u32)))
                 .dedup()
                 .exactly_one()
@@ -57,7 +54,7 @@ impl<const GRID_SIZE: usize> TileUsages<GRID_SIZE> {
 
         for word in level.words().iter() {
             let tiles: GridSet = match word
-                .find_solutions::<LAYOUT>(level.grid())
+                .find_solutions::<GRID_SIZE, LAYOUT>(level.grid())
                 .map(|s| GridSet::from_iter(s.into_iter().map(|x| x.0 as u32)))
                 .dedup()
                 .exactly_one()

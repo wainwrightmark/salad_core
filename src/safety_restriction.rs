@@ -2,7 +2,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIs, EnumIter, EnumString};
 
-use crate::prelude::{Grid, GridLayout, GridSet, WordTrait};
+use crate::prelude::{BasicWordTrait, Grid, GridLayout, GridSet};
 
 #[derive(
     Debug,
@@ -37,14 +37,16 @@ impl SafetyRestriction {
 
     pub fn check_is_safe<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
         self,
-        word: &impl WordTrait<GRID_SIZE>,
+        word: &impl BasicWordTrait,
         grid: Grid<GRID_SIZE>,
     ) -> bool {
         match self {
             SafetyRestriction::None => true,
             SafetyRestriction::UnambiguousFirstLetters => {
                 let mut current_set = GridSet::EMPTY;
-                for solution in word.find_solutions_with_tiles::<LAYOUT>(grid, GridSet::EMPTY) {
+                for solution in
+                    word.find_solutions_with_tiles::<GRID_SIZE, LAYOUT>(grid, GridSet::EMPTY)
+                {
                     if let Some(first_tile) = solution.first() {
                         current_set.insert_const(first_tile.inner_u32());
 
@@ -58,7 +60,7 @@ impl SafetyRestriction {
             SafetyRestriction::Paper | SafetyRestriction::PaperAndArizona => {
                 //Check paper safe
                 if word
-                    .find_solutions::<LAYOUT>(grid)
+                    .find_solutions::<GRID_SIZE, LAYOUT>(grid)
                     .map(|s| GridSet::from_iter(s.into_iter().map(|x| x.0 as u32)))
                     .dedup()
                     .exactly_one()
@@ -69,7 +71,7 @@ impl SafetyRestriction {
                 }
 
                 if self.is_paper_and_arizona() {
-                    if !word.is_arizona_safe::<LAYOUT>(&grid) {
+                    if !word.is_arizona_safe::<GRID_SIZE, LAYOUT>(&grid) {
                         return false;
                     }
                 }

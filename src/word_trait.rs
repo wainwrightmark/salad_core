@@ -9,11 +9,12 @@ use crate::prelude::*;
 use crate::{Character, Grid, GridSet, GridTile, Solution};
 
 pub struct WordSolutionIter<
+    'c,
     const GRID_SIZE: usize,
     LAYOUT: GridLayout<GRID_SIZE>,
     const BLANKS_ARE_WILDCARDS: bool,
 > {
-    characters: ArrayVec<Character, GRID_SIZE>,
+    characters: &'c [Character],
     grid: Grid<GRID_SIZE>,
 
     next_first_tile: Option<GridTile>,
@@ -21,10 +22,10 @@ pub struct WordSolutionIter<
     phantom: PhantomData<LAYOUT>,
 }
 
-impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool>
-    WordSolutionIter<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>
+impl<'a, const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool>
+    WordSolutionIter<'a, GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>
 {
-    pub fn new(characters: ArrayVec<Character, GRID_SIZE>, grid: Grid<GRID_SIZE>) -> Self {
+    pub fn new(characters: &'a [Character], grid: Grid<GRID_SIZE>) -> Self {
         let next_first_tile: Option<GridTile> = if let Some(first_char) = characters.first() {
             grid.enumerate()
                 .filter(|x| x.1 == *first_char || (BLANKS_ARE_WILDCARDS && x.1.is_blank()))
@@ -53,8 +54,8 @@ struct WSIState<const GRID_SIZE: usize> {
     char_to_find: Character,
 }
 
-impl<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool>
-    Iterator for WordSolutionIter<GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>
+impl<'a, const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>, const BLANKS_ARE_WILDCARDS: bool>
+    Iterator for WordSolutionIter<'a, GRID_SIZE, LAYOUT, BLANKS_ARE_WILDCARDS>
 {
     type Item = Solution<GRID_SIZE>;
 
@@ -164,6 +165,78 @@ pub trait BasicWordTrait: Clone + PartialEq + PartialOrd {
     //todo move some default methods from WordTrait here
     fn text(&self) -> Ustr;
     fn characters_slice(&self) -> &[Character];
+
+    /// Return the letter counts of this word.
+    /// Some implementations will store a cached value, others will recalculate it each time
+    /// Returns `None` if the letters don't fit in a bag
+    fn letter_counts(&self) -> Option<LetterCounts> {
+        LetterCounts::try_from_iter(self.characters_slice().iter().cloned())
+    }
+
+    fn find_solutions<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
+        &self,
+        grid: Grid<GRID_SIZE>,
+    ) -> impl Iterator<Item = Solution<GRID_SIZE>> {
+        WordSolutionIter::<GRID_SIZE, LAYOUT, false>::new(self.characters_slice(), grid)
+    }
+
+    fn find_solution<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
+        &self,
+        grid: Grid<GRID_SIZE>,
+    ) -> Option<Solution<GRID_SIZE>> {
+        WordSolutionIter::<GRID_SIZE, LAYOUT, false>::new(self.characters_slice(), grid).next()
+    }
+
+    fn find_solutions_blanks_as_wildcards<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
+        &self,
+        grid: Grid<GRID_SIZE>,
+    ) -> impl Iterator<Item = Solution<GRID_SIZE>> {
+        WordSolutionIter::<GRID_SIZE, LAYOUT, true>::new(self.characters_slice(), grid)
+    }
+
+    fn find_solutions_with_tiles<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
+        &self,
+        mut grid: Grid<GRID_SIZE>,
+        unneeded_tiles: GridSet,
+    ) -> impl Iterator<Item = Solution<GRID_SIZE>> {
+        for tile in unneeded_tiles.iter_const() {
+            grid[GridTile(tile as u8)] = Character::Blank;
+        }
+        Self::find_solutions::<GRID_SIZE, LAYOUT>(self, grid)
+    }
+
+    fn clue(&self) -> Option<Ustr>;
+
+    fn is_arizona_safe<const GRID_SIZE: usize, LAYOUT: GridLayout<GRID_SIZE>>(
+        &self,
+        grid: &Grid<GRID_SIZE>,
+    ) -> bool {
+        let characters = self.characters_slice();
+
+        for index1 in 0..characters.len().saturating_sub(3) {
+            let character_1 = characters[index1];
+            for index2 in (index1 + 3)..characters.len() {
+                let character_2 = characters[index2];
+
+                if character_1 == character_2 {
+                    for solution in self.find_solutions::<GRID_SIZE, LAYOUT>(*grid) {
+                        let tile_1 = solution[index1];
+                        let tile_before_2 = solution[index2 - 1];
+                        if LAYOUT::are_tiles_adjacent(tile_1, tile_before_2) {
+                            if let Some(tile_after_2) = solution.get(index2 + 1) {
+                                if LAYOUT::are_tiles_adjacent(tile_1, *tile_after_2) {
+                                    return false;
+                                }
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        true
+    }
 
     /// The word lengths of the answer. No brackets
     fn hidden_text(&self) -> String {
@@ -280,75 +353,6 @@ pub trait WordWithCounts: BasicWordTrait {
 
 pub trait WordTrait<const GRID_SIZE: usize>: BasicWordTrait {
     fn characters(&self) -> &ArrayVec<Character, GRID_SIZE>;
-
-    fn clue(&self) -> Option<Ustr>;
-
-    /// Return the letter counts of this word.
-    /// Some implementations will store a cached value, others will recalculate it each time
-    /// Returns `None` if the letters don't fit in a bag
-    fn letter_counts(&self) -> Option<LetterCounts> {
-        LetterCounts::try_from_iter(self.characters_slice().iter().cloned())
-    }
-
-    fn find_solutions<LAYOUT: GridLayout<GRID_SIZE>>(
-        &self,
-        grid: Grid<GRID_SIZE>,
-    ) -> impl Iterator<Item = Solution<GRID_SIZE>> {
-        WordSolutionIter::<GRID_SIZE, LAYOUT, false>::new(self.characters().clone(), grid)
-    }
-
-    fn find_solution<LAYOUT: GridLayout<GRID_SIZE>>(
-        &self,
-        grid: Grid<GRID_SIZE>,
-    ) -> Option<Solution<GRID_SIZE>> {
-        WordSolutionIter::<GRID_SIZE, LAYOUT, false>::new(self.characters().clone(), grid).next()
-    }
-
-    fn find_solutions_blanks_as_wildcards<LAYOUT: GridLayout<GRID_SIZE>>(
-        &self,
-        grid: Grid<GRID_SIZE>,
-    ) -> impl Iterator<Item = Solution<GRID_SIZE>> {
-        WordSolutionIter::<GRID_SIZE, LAYOUT, true>::new(self.characters().clone(), grid)
-    }
-
-    fn find_solutions_with_tiles<LAYOUT: GridLayout<GRID_SIZE>>(
-        &self,
-        mut grid: Grid<GRID_SIZE>,
-        unneeded_tiles: GridSet,
-    ) -> impl Iterator<Item = Solution<GRID_SIZE>> {
-        for tile in unneeded_tiles.iter_const() {
-            grid[GridTile(tile as u8)] = Character::Blank;
-        }
-        Self::find_solutions::<LAYOUT>(self, grid)
-    }
-
-    fn is_arizona_safe<LAYOUT: GridLayout<GRID_SIZE>>(&self, grid: &Grid<GRID_SIZE>) -> bool {
-        let characters = self.characters_slice();
-
-        for index1 in 0..characters.len().saturating_sub(3) {
-            let character_1 = characters[index1];
-            for index2 in (index1 + 3)..characters.len() {
-                let character_2 = characters[index2];
-
-                if character_1 == character_2 {
-                    for solution in self.find_solutions::<LAYOUT>(*grid) {
-                        let tile_1 = solution[index1];
-                        let tile_before_2 = solution[index2 - 1];
-                        if LAYOUT::are_tiles_adjacent(tile_1, tile_before_2) {
-                            if let Some(tile_after_2) = solution.get(index2 + 1) {
-                                if LAYOUT::are_tiles_adjacent(tile_1, *tile_after_2) {
-                                    return false;
-                                }
-                            } else {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        true
-    }
 }
 
 impl<const GRID_SIZE: usize> BasicWordTrait for CharsArray<GRID_SIZE> {
@@ -359,15 +363,14 @@ impl<const GRID_SIZE: usize> BasicWordTrait for CharsArray<GRID_SIZE> {
     fn characters_slice(&self) -> &[Character] {
         self.as_slice()
     }
+    fn clue(&self) -> Option<Ustr> {
+        None
+    }
 }
 
 impl<const GRID_SIZE: usize> WordTrait<GRID_SIZE> for CharsArray<GRID_SIZE> {
     fn characters(&self) -> &ArrayVec<Character, GRID_SIZE> {
         &self
-    }
-
-    fn clue(&self) -> Option<Ustr> {
-        None
     }
 }
 
@@ -379,10 +382,7 @@ mod tests {
     use insta::assert_snapshot;
     use itertools::Itertools;
 
-    use crate::{
-        DesignedLevel, grid_layout::Square16Layout, level_trait::LevelTrait, prelude::*,
-        word_trait::WordTrait,
-    };
+    use crate::{DesignedLevel, grid_layout::Square16Layout, level_trait::LevelTrait, prelude::*};
     pub type Solution4x4 = Solution<16>;
 
     #[test]
@@ -454,7 +454,7 @@ mod tests {
 
         for (index, word) in level.words.iter().enumerate() {
             let solutions = word
-                .find_solutions_blanks_as_wildcards::<Square16Layout>(grid)
+                .find_solutions_blanks_as_wildcards::<16, Square16Layout>(grid)
                 .collect_vec();
 
             results.push(SolutionResult {
@@ -474,7 +474,7 @@ mod tests {
                     .map(|x| x.1)
                 {
                     let solutions = word2
-                        .find_solutions_with_tiles::<Square16Layout>(grid, ut)
+                        .find_solutions_with_tiles::<16, Square16Layout>(grid, ut)
                         .collect_vec();
 
                     results.push(SolutionResult {
@@ -493,10 +493,11 @@ mod tests {
     pub fn test_find_solution_blanks_as_wildcards() {
         let grid: Grid<19> = try_make_grid("P_ESITGATROLNEWNRMO").unwrap();
 
-        let word = DisplayWord::from_string("Strix", &SpecialCharacters::NONE).unwrap();
+        let word: DisplayWord<16> =
+            DisplayWord::from_string("Strix", &SpecialCharacters::NONE).unwrap();
 
         let Some(solution) = word
-            .find_solutions_blanks_as_wildcards::<Hexagon19ThinLayout>(grid)
+            .find_solutions_blanks_as_wildcards::<19, Hexagon19ThinLayout>(grid)
             .next()
         else {
             panic!("Could not find solution")

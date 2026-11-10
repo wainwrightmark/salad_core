@@ -107,7 +107,8 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
         for (index, word) in self.words().iter().enumerate() {
             if !is_word_found(index) {
                 let mut current_set = GridSet::EMPTY;
-                for solution in word.find_solutions_with_tiles::<Self::Layout>(grid, unneeded_tiles)
+                for solution in
+                    word.find_solutions_with_tiles::<GRID_SIZE, Self::Layout>(grid, unneeded_tiles)
                 {
                     if let Some(first_tile) = solution.first() {
                         current_set.insert_const(first_tile.inner_u32());
@@ -133,7 +134,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
     fn is_arizona_safe(&self) -> bool {
         //we want to avoid characters that are duplicates where either the duplicate is the last the letters after the duplicate
         for word in self.words() {
-            if !word.is_arizona_safe::<Self::Layout>(&self.grid()) {
+            if !word.is_arizona_safe::<GRID_SIZE, Self::Layout>(&self.grid()) {
                 return false;
             }
         }
@@ -230,7 +231,7 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
     }
 
     fn final_word_score(&self, word: &impl WordTrait<GRID_SIZE>) -> Option<f32> {
-        word.find_solutions::<Self::Layout>(self.grid())
+        word.find_solutions::<GRID_SIZE, Self::Layout>(self.grid())
             .flat_map(|solution| {
                 let path_count = crate::possible_paths::count_solution_possible_paths::<
                     GRID_SIZE,
@@ -374,13 +375,16 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
             let char_instances = grid_prime_bag.count_instances(character);
 
             for word in self.words() {
-                let word_char_instances =
-                    word.characters().iter().filter(|c| character.eq(c)).count();
+                let word_char_instances = word
+                    .characters_slice()
+                    .iter()
+                    .filter(|c| character.eq(c))
+                    .count();
 
                 if word_char_instances == 0 {
                 } else if word_char_instances == char_instances
                     || word
-                        .find_solutions::<Self::Layout>(self.grid())
+                        .find_solutions::<GRID_SIZE, Self::Layout>(self.grid())
                         .all(|arr| arr.contains(&tile))
                 {
                     words_using += 1;
@@ -500,7 +504,10 @@ pub trait LevelTrait<const GRID_SIZE: usize>: Clone {
                         .filter(|x| !is_word_found(x.0))
                         .map(|x| x.1)
                     {
-                        if word.find_solution::<Self::Layout>(remaining_grid).is_none() {
+                        if word
+                            .find_solution::<GRID_SIZE, Self::Layout>(remaining_grid)
+                            .is_none()
+                        {
                             continue 'tiles_to_check;
                         }
                     }
