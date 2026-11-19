@@ -174,65 +174,65 @@ impl ColorScheme {
 // };
 
 pub const COLOR_SCHEME_LETTUCE: ColorScheme = ColorScheme {
-    background: rgb_hex(0xFDFCF9).with_alpha(1.000), //#FDFCF9
-accent_main: rgb_hex(0x34C77B).with_alpha(1.000), //#34C77B
-accent_background: rgb_hex(0x34C77B).with_alpha(1.000), //#34C77B
-accent_opposite: rgb_hex(0xFFFFFF).with_alpha(1.000), //#FFFFFF
-accent_tint: rgb_hex(0xDDF5E7).with_alpha(1.000), //#DDF5E7
-accent_shade: rgb_hex(0x1E8A52).with_alpha(1.000), //#1E8A52
-tile_background: rgb_hex(0xFFFFFF).with_alpha(1.000), //#FFFFFF
-hint_main: rgb_hex(0x4B67F4).with_alpha(1.000), //#4B67F4
-hint_tint: rgb_hex(0xE7E9FF).with_alpha(1.000), //#E7E9FF
-hint_opposite: rgb_hex(0xFFFFFF).with_alpha(1.000), //#FFFFFF
-type_dark: rgb_hex(0x2F2C3E).with_alpha(1.000), //#2F2C3E
-type_light: rgb_hex(0xFFFFFF).with_alpha(1.000), //#FFFFFF
-grey_1: rgb_hex(0x8F8D9B).with_alpha(1.000), //#8F8D9B
-grey_2: rgb_hex(0xDEDEDE).with_alpha(1.000), //#DEDEDE
-swoosh_1: rgb_hex(0x5BC150).with_alpha(1.000), //#5BC150
-swoosh_2: rgb_hex(0x5DC8AF).with_alpha(1.000), //#5DC8AF
-swoosh_3: rgb_hex(0x57BFE9).with_alpha(1.000), //#57BFE9
-swoosh_4: rgb_hex(0x3D8AF7).with_alpha(1.000), //#3D8AF7
-swoosh_5: rgb_hex(0x1D46F6).with_alpha(1.000), //#1D46F6
-swoosh_6: rgb_hex(0x1D15F3).with_alpha(1.000), //#1D15F3
-swoosh_7: rgb_hex(0x4C0BF1).with_alpha(1.000), //#4C0BF1
-swoosh_8: rgb_hex(0x8D1BF5).with_alpha(1.000), //#8D1BF5
-swoosh_9: rgb_hex(0xD52EF5).with_alpha(1.000), //#D52EF5
-swoosh_10: rgb_hex(0xE637C8).with_alpha(1.000), //#E637C8
-swoosh_11: rgb_hex(0xE93680).with_alpha(1.000), //#E93680
-swoosh_12: rgb_hex(0xE83443).with_alpha(1.000), //#E83443
-swoosh_13: rgb_hex(0xE84429).with_alpha(1.000), //#E84429
-swoosh_14: rgb_hex(0xEB712E).with_alpha(1.000), //#EB712E
-swoosh_15: rgb_hex(0xEBA43B).with_alpha(1.000), //#EBA43B
-swoosh_16: rgb_hex(0xDAB23E).with_alpha(1.000), //#DAB23E
-swoosh_17: rgb_hex(0xC3B83E).with_alpha(1.000), //#C3B83E
-swoosh_18: rgb_hex(0xB2C13E).with_alpha(1.000), //#B2C13E
-swoosh_19: rgb_hex(0x95C13E).with_alpha(1.000), //#95C13E
-hint_shade: rgb_hex(0x4A2FC4).with_alpha(1.000), //#4A2FC4
-type_secondary: rgb_hex(0x57546A).with_alpha(1.000), //#57546A
-highlight: rgb_hex(0xEFA03A).with_alpha(1.000), //#EFA03A
-grey_3: rgb_hex(0xC9C8D0).with_alpha(1.000), //#C9C8D0
-divider: rgb_hex(0x2F2C3E).with_alpha(0.080), //#2F2C3E
-border: rgb_hex(0x2F2C3E).with_alpha(0.150), //#2F2C3E
-scrim: rgb_hex(0x2F2C3E).with_alpha(0.350), //#2F2C3E
-icon_muted: rgb_hex(0x2F2C3E).with_alpha(0.550), //#2F2C3E
-on_accent: rgb_hex(0xFFFFFF).with_alpha(0.750), //#FFFFFF
-on_accent_faint: rgb_hex(0xFFFFFF).with_alpha(0.300), //#FFFFFF
-accent_wash: rgb_hex(0x34C77B).with_alpha(0.500), //#34C77B
-logo: rgb_hex(0x34C77B).with_alpha(1.000), //#34C77B
-logo_hero: rgb_hex(0x34C77B).with_alpha(1.000), //#34C77B
-surface_raised: rgb_hex(0xFFFFFF).with_alpha(1.000), //#FFFFFF
-firsts_tile: rgb_hex(0xDDF5E7).with_alpha(1.000), //#DDF5E7
-firsts_letter: rgb_hex(0x1E8A52).with_alpha(1.000), //#1E8A52
-answer_tile: rgb_hex(0x34C77B).with_alpha(1.000), //#34C77B
-panel: rgb_hex(0xDDF5E7).with_alpha(1.000), //#DDF5E7
-panel_on_tint: rgb_hex(0x34C77B).with_alpha(1.000), //#34C77B
-on_panel: rgb_hex(0x2F2C3E).with_alpha(1.000), //#2F2C3E
-panel_button: rgb_hex(0x34C77B).with_alpha(1.000), //#34C77B
-panel_button_on_tint: rgb_hex(0xFFFFFF).with_alpha(1.000), //#FFFFFF
-hint_on_fill: rgb_hex(0x4A2FC4).with_alpha(1.000), //#4A2FC4
-badge: rgb_hex(0x34C77B).with_alpha(1.000), //#34C77B
-badge_icon: rgb_hex(0x2F2C3E).with_alpha(1.000), //#2F2C3E
-on_inverse: rgb_hex(0xFFFFFF).with_alpha(1.000), //#FFFFFF
+    background: rgb_hex(0xFDFCF9).with_alpha(1.000), // #FDFCF9
+accent_main: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
+accent_background: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
+accent_opposite: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
+accent_tint: rgb_hex(0xDDF5E7).with_alpha(1.000), // #DDF5E7
+accent_shade: rgb_hex(0x1E8A52).with_alpha(1.000), // #1E8A52
+tile_background: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
+hint_main: rgb_hex(0x4B67F4).with_alpha(1.000), // #4B67F4
+hint_tint: rgb_hex(0xE7E9FF).with_alpha(1.000), // #E7E9FF
+hint_opposite: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
+type_dark: rgb_hex(0x2F2C3E).with_alpha(1.000), // #2F2C3E
+type_light: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
+grey_1: rgb_hex(0x8F8D9B).with_alpha(1.000), // #8F8D9B
+grey_2: rgb_hex(0xDEDEDE).with_alpha(1.000), // #DEDEDE
+swoosh_1: rgb_hex(0x5BC150).with_alpha(1.000), // #5BC150
+swoosh_2: rgb_hex(0x5DC8AF).with_alpha(1.000), // #5DC8AF
+swoosh_3: rgb_hex(0x57BFE9).with_alpha(1.000), // #57BFE9
+swoosh_4: rgb_hex(0x3D8AF7).with_alpha(1.000), // #3D8AF7
+swoosh_5: rgb_hex(0x1D46F6).with_alpha(1.000), // #1D46F6
+swoosh_6: rgb_hex(0x1D15F3).with_alpha(1.000), // #1D15F3
+swoosh_7: rgb_hex(0x4C0BF1).with_alpha(1.000), // #4C0BF1
+swoosh_8: rgb_hex(0x8D1BF5).with_alpha(1.000), // #8D1BF5
+swoosh_9: rgb_hex(0xD52EF5).with_alpha(1.000), // #D52EF5
+swoosh_10: rgb_hex(0xE637C8).with_alpha(1.000), // #E637C8
+swoosh_11: rgb_hex(0xE93680).with_alpha(1.000), // #E93680
+swoosh_12: rgb_hex(0xE83443).with_alpha(1.000), // #E83443
+swoosh_13: rgb_hex(0xE84429).with_alpha(1.000), // #E84429
+swoosh_14: rgb_hex(0xEB712E).with_alpha(1.000), // #EB712E
+swoosh_15: rgb_hex(0xEBA43B).with_alpha(1.000), // #EBA43B
+swoosh_16: rgb_hex(0xDAB23E).with_alpha(1.000), // #DAB23E
+swoosh_17: rgb_hex(0xC3B83E).with_alpha(1.000), // #C3B83E
+swoosh_18: rgb_hex(0xB2C13E).with_alpha(1.000), // #B2C13E
+swoosh_19: rgb_hex(0x95C13E).with_alpha(1.000), // #95C13E
+hint_shade: rgb_hex(0x4A2FC4).with_alpha(1.000), // #4A2FC4
+type_secondary: rgb_hex(0x57546A).with_alpha(1.000), // #57546A
+highlight: rgb_hex(0xEFA03A).with_alpha(1.000), // #EFA03A
+grey_3: rgb_hex(0xC9C8D0).with_alpha(1.000), // #C9C8D0
+divider: rgb_hex(0x2F2C3E).with_alpha(0.080), // #2F2C3E
+border: rgb_hex(0x2F2C3E).with_alpha(0.150), // #2F2C3E
+scrim: rgb_hex(0x2F2C3E).with_alpha(0.350), // #2F2C3E
+icon_muted: rgb_hex(0x2F2C3E).with_alpha(0.550), // #2F2C3E
+on_accent: rgb_hex(0xFFFFFF).with_alpha(0.750), // #FFFFFF
+on_accent_faint: rgb_hex(0xFFFFFF).with_alpha(0.300), // #FFFFFF
+accent_wash: rgb_hex(0x34C77B).with_alpha(0.500), // #34C77B
+logo: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
+logo_hero: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
+surface_raised: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
+firsts_tile: rgb_hex(0xDDF5E7).with_alpha(1.000), // #DDF5E7
+firsts_letter: rgb_hex(0x1E8A52).with_alpha(1.000), // #1E8A52
+answer_tile: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
+panel: rgb_hex(0xDDF5E7).with_alpha(1.000), // #DDF5E7
+panel_on_tint: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
+on_panel: rgb_hex(0x2F2C3E).with_alpha(1.000), // #2F2C3E
+panel_button: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
+panel_button_on_tint: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
+hint_on_fill: rgb_hex(0x4A2FC4).with_alpha(1.000), // #4A2FC4
+badge: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
+badge_icon: rgb_hex(0x2F2C3E).with_alpha(1.000), // #2F2C3E
+on_inverse: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
 };
 
 pub const COLOR_SCHEME_KALE: ColorScheme = ColorScheme {
@@ -243,8 +243,8 @@ accent_opposite: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
 accent_tint: rgb_hex(0x2B2938).with_alpha(1.000), // #2B2938
 accent_shade: rgb_hex(0xF2F1F6).with_alpha(1.000), // #F2F1F6
 tile_background: rgb_hex(0x262433).with_alpha(1.000), // #262433
-hint_main: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
-hint_tint: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
+hint_main: rgb_hex(0xCBAFFF).with_alpha(1.000), // #34C77B
+hint_tint: rgb_hex(0x443D70).with_alpha(1.000), // #34C77B
 hint_opposite: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
 type_dark: rgb_hex(0xF2F1F6).with_alpha(1.000), // #F2F1F6
 type_light: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
