@@ -167,7 +167,7 @@ impl ClueTextSegment {
             ClueTextSegment::Icon { .. } => 1,
             ClueTextSegment::ColorName { is_alternate } => {
                 if *is_alternate {
-                    color_scheme.accent_color_name_alternate().len()
+                    color_scheme.hint_accent_color_name().len()
                 } else {
                     color_scheme.accent_color_name().len()
                 }
@@ -508,7 +508,7 @@ impl ClueText {
                             color_scheme,
                         );
                         let text = if *is_alternate {
-                            color_scheme_choice.accent_color_name_alternate()
+                            color_scheme_choice.hint_accent_color_name()
                         } else {
                             color_scheme_choice.accent_color_name()
                         };
@@ -595,7 +595,7 @@ impl ClueText {
                     ClueTextSegment::WordLength(wl) => {
                         let smaller_font_size = (font_size * 15.0 / 18.0).round();
 
-                        write!(&mut svg, r#"<tspan font-size={smaller_font_size} font-weight="700" font-style="normal" fill={word_length_fill} dominant-baseline="central">{wl}</tspan>"#).unwrap();
+                        write!(&mut svg, r#"<tspan font-size={smaller_font_size} font-weight="600" font-style="normal" fill={word_length_fill} dominant-baseline="central">{wl}</tspan>"#).unwrap();
                     }
                 }
             }
@@ -666,7 +666,7 @@ mod tests {
             font_size: 12.0,
             font_family: "montserrat",
             icons_font_family: "gameicons",
-            color_scheme_choice: crate::color_scheme::ColorSchemeChoice::Light1,
+            color_scheme_choice: crate::color_scheme::ColorSchemeChoice::Kale,
         };
 
         let icons_paths = IconPathData::new(LazyLock::new(|| "sun".lines().collect()));
