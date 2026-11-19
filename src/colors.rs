@@ -174,7 +174,7 @@ impl ColorScheme {
 // };
 
 pub const COLOR_SCHEME_LETTUCE: ColorScheme = ColorScheme {
-    background: rgb_hex(0xFDFCF9).with_alpha(1.000), // #FDFCF9
+    background: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FDFCF9
 accent_main: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
 accent_background: rgb_hex(0x34C77B).with_alpha(1.000), // #34C77B
 accent_opposite: rgb_hex(0xFFFFFF).with_alpha(1.000), // #FFFFFF
