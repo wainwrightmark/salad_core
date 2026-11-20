@@ -405,6 +405,8 @@ pub struct ClueTextSVGArgs {
     pub width: f32,
     pub height: f32,
     pub font_size: f32,
+    /// 600 for clues. 400 for home screen
+    pub base_font_weight: u32,
     pub font_family: &'static str,
     pub icons_font_family: &'static str,
     pub color_scheme_choice: ColorSchemeChoice,
@@ -427,6 +429,7 @@ impl ClueText {
             height,
             font_size,
             font_family,
+            base_font_weight,
             icons_font_family,
             color_scheme_choice,
         } = args;
@@ -467,11 +470,12 @@ impl ClueText {
             is_answers: bool,
             text_color: TextColor,
             color_scheme: &ColorScheme,
-        ) -> (i32, &'static str, Srgba) {
+            base_font_weight: u32,
+        ) -> (u32, &'static str, Srgba) {
             if is_answers {
-                (800, "normal", color_scheme.accent_main)
+                (base_font_weight + 200, "normal", color_scheme.accent_main)
             } else {
-                let weight = if is_bold { 700 } else { 600 };
+                let weight = if is_bold { base_font_weight + 100 } else { base_font_weight };
                 let font_style = if is_italic { "italic" } else { "normal" };
                 let fill = match text_color {
                     TextColor::Default => color_scheme.type_dark,
@@ -506,6 +510,7 @@ impl ClueText {
                             is_answers,
                             text_color,
                             color_scheme,
+                            base_font_weight
                         );
                         let text = if *is_alternate {
                             color_scheme_choice.hint_accent_color_name()
@@ -537,6 +542,7 @@ impl ClueText {
                             is_answers,
                             text_color,
                             color_scheme,
+                            base_font_weight
                         );
                         match icon_paths.get_icon_character(name_lower) {
                             Some(char) => {
@@ -555,6 +561,7 @@ impl ClueText {
                             is_answers,
                             text_color,
                             color_scheme,
+                            base_font_weight
                         );
 
                         write!(&mut svg, r#"<tspan font-size={font_size} font-weight="{weight}" font-style="{font_style}" fill={fill} dominant-baseline="central">{text}</tspan>"#).unwrap();
@@ -566,6 +573,7 @@ impl ClueText {
                             is_answers,
                             text_color,
                             color_scheme,
+                            base_font_weight
                         );
 
                         write!(&mut svg, r#"<tspan font-size={font_size} font-weight="{weight}" font-style="{font_style}" fill={fill} dominant-baseline="central">&nbsp;</tspan>"#).unwrap();
@@ -595,7 +603,7 @@ impl ClueText {
                     ClueTextSegment::WordLength(wl) => {
                         let smaller_font_size = (font_size * 15.0 / 18.0).round();
 
-                        write!(&mut svg, r#"<tspan font-size={smaller_font_size} font-weight="600" font-style="normal" fill={word_length_fill} dominant-baseline="central">{wl}</tspan>"#).unwrap();
+                        write!(&mut svg, r#"<tspan font-size={smaller_font_size} font-weight={base_font_weight} font-style="normal" fill={word_length_fill} dominant-baseline="central">{wl}</tspan>"#).unwrap();
                     }
                 }
             }
@@ -667,6 +675,7 @@ mod tests {
             font_family: "montserrat",
             icons_font_family: "gameicons",
             color_scheme_choice: crate::color_scheme::ColorSchemeChoice::Kale,
+            base_font_weight: 600
         };
 
         let icons_paths = IconPathData::new(LazyLock::new(|| "sun".lines().collect()));
